@@ -134,8 +134,9 @@ Beyond the hackathon prototype:
 
 Built by a two-person youth team from Tunisia for the UNESCO Youth Hackathon 2026
 
-Youcef chalbi - computer engineering student
-hamdi Belhadj - cloud engineering student
+**Youcef chalbi** - computer engineering student
+
+**hamdi Belhadj** - cloud engineering student
 
 ---
 
