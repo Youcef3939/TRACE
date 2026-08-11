@@ -16,13 +16,11 @@ const item = {
 };
 
 export default function HowItWorks() {
-  const preview = STEPS.slice(0, 3);
-
   return (
     <section className="bg-cream py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <motion.div
-          className="max-w-2xl"
+          className="mx-auto max-w-2xl text-center"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
@@ -38,13 +36,13 @@ export default function HowItWorks() {
         </motion.div>
 
         <motion.div
-          className="mt-14 grid gap-6 sm:grid-cols-3"
+          className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
           variants={container}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.1 }}
         >
-          {preview.map(({ icon: Icon, label, description }, i) => (
+          {STEPS.map(({ icon: Icon, label, description }, i) => (
             <motion.div
               key={label}
               variants={item}
@@ -66,20 +64,7 @@ export default function HowItWorks() {
           ))}
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.35, delay: 0.2 }}
-        >
-          <Link
-            href="/how-it-works"
-            className="mt-10 inline-flex items-center gap-2 text-sm font-semibold text-teal transition-colors hover:text-teal-dark"
-          >
-            See the full process
-            <ArrowRight size={16} />
-          </Link>
-        </motion.div>
+        {/* Full process is shown above */}
       </div>
     </section>
   );
