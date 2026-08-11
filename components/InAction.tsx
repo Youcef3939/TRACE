@@ -1,36 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ChevronDown, AlertTriangle, ArrowRight, Globe, FlaskConical, Users } from "lucide-react";
-
-const REASONING_STEPS = [
-  {
-    icon: Globe,
-    title: "Source trace",
-    text: "The claim traces back to a 2019 blog post with no cited research, later reshared without context on social media.",
-  },
-  {
-    icon: FlaskConical,
-    title: "Evidence check",
-    text: "No peer-reviewed studies support the claim. Three independent oncology researchers found no causal mechanism.",
-  },
-  {
-    icon: Users,
-    title: "Consensus",
-    text: "Major health authorities (WHO, national cancer institutes) explicitly list this claim as a documented myth.",
-  },
-];
+import { AlertTriangle, ArrowRight, Search, FileSearch, Scale } from "lucide-react";
 
 export default function InAction({ showCta = false }: { showCta?: boolean }) {
-  const [open, setOpen] = useState(false);
-
   return (
-    <section className="bg-cream py-20 sm:py-28">
-      <div className="mx-auto max-w-4xl px-5 sm:px-8">
+    <section className="bg-cream py-24 sm:py-32 text-ink">
+      <div className="mx-auto max-w-5xl px-5 sm:px-8">
         <motion.div
-          className="max-w-2xl"
+          className="mb-12 mx-auto max-w-2xl text-center"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
@@ -40,72 +19,125 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
             See TRACE in action
           </h2>
           <p className="mt-3 text-lg text-ink/65">
-            A real investigation, start to finish — every step stays visible.
+            A real investigation, start to finish — every step stays visible, transparent, and auditable.
           </p>
         </motion.div>
 
+        {/* Dashboard Canvas */}
         <motion.div
-          className="mt-10 overflow-hidden rounded-2xl border-2 border-ink/10 bg-white"
-          initial={{ opacity: 0, y: 16 }}
+          className="relative overflow-hidden rounded-3xl border-2 border-ink/10 bg-white shadow-xl"
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.35, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <div className="flex flex-col gap-4 border-b border-ink/10 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          {/* Dashboard Header */}
+          <div className="flex flex-col gap-4 border-b border-ink/10 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8 bg-white">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-wide text-ink/40">
-                Claim investigated
+              <span className="font-mono text-xs uppercase tracking-widest text-ink/40">
+                // TARGET_CLAIM_ID: 982A-F3
               </span>
-              <p className="mt-1 text-xl font-semibold text-ink">
-                &ldquo;Coffee cures cancer&rdquo;
+              <p className="mt-2 text-xl font-semibold text-ink sm:text-2xl">
+                &ldquo;Drinking coffee cures stage 4 cancer within weeks.&rdquo;
               </p>
             </div>
-            <span className="inline-flex shrink-0 items-center gap-2 self-start rounded-full bg-coral/10 px-4 py-2 text-sm font-semibold text-coral">
-              <AlertTriangle size={16} />
-              Unsupported claim
-            </span>
+            <div className="shrink-0 self-start sm:self-auto">
+              <div className="inline-flex items-center gap-2 rounded-full bg-coral/10 px-4 py-2 text-sm font-bold text-coral">
+                <AlertTriangle size={16} strokeWidth={2.5} />
+                Unsupported Claim
+              </div>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="flex w-full items-center justify-between px-6 py-4 text-left text-sm font-semibold text-teal transition-colors hover:bg-teal/5 sm:px-8 cursor-pointer"
-            aria-expanded={open}
-          >
-            How we reached this
-            <ChevronDown
-              size={18}
-              className={`transition-transform ${open ? "rotate-180" : ""}`}
-            />
-          </button>
+          {/* Dashboard Pipeline / Timeline */}
+          <div className="p-6 sm:p-8">
+            <div className="relative border-l-2 border-ink/10 pl-6 space-y-10 sm:space-y-12">
+              
+              {/* Step 1: Claim Extraction & Tracing */}
+              <div className="relative">
+                <div className="absolute -left-[35px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-teal text-white">
+                  <Search size={14} strokeWidth={3} />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-ink">Source tracing</h3>
+                </div>
+                <p className="text-sm leading-relaxed text-ink/70 max-w-2xl">
+                  The claim traces back to a 2019 holistic wellness blog post with no cited medical research. It was later paraphrased and reshared out of context on Facebook.
+                </p>
+              </div>
 
-          {open && (
-            <div className="space-y-5 border-t border-ink/10 bg-teal/[0.03] px-6 py-6 sm:px-8">
-              {REASONING_STEPS.map(({ icon: Icon, title, text }) => (
-                <div key={title} className="flex gap-4">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal/10 text-teal">
-                    <Icon size={17} />
+              {/* Step 2: Sourcing Sherlock (Split Card) */}
+              <div className="relative">
+                <div className="absolute -left-[35px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-teal text-white">
+                  <FileSearch size={14} strokeWidth={3} />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-4">
+                  <h3 className="text-lg font-semibold text-ink">Sourcing Sherlock Comparison</h3>
+                </div>
+                
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Left: Viral Post */}
+                  <div className="rounded-xl border border-ink/10 bg-cream/50 p-5">
+                    <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-ink/50">Viral Social Post</span>
+                    <p className="text-sm italic text-ink/80">
+                      "A new breakthrough! Big Pharma is hiding this, but drinking 3 cups of coffee daily actually cures stage 4 cancer within weeks! ☕🧬"
+                    </p>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-ink">{title}</h4>
-                    <p className="mt-0.5 text-sm leading-relaxed text-ink/65">{text}</p>
+                  {/* Right: Primary Source Fact */}
+                  <div className="rounded-xl border border-ink/10 bg-cream/50 p-5 flex flex-col justify-between">
+                    <div>
+                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-teal">Primary Source (Study)</span>
+                      <p className="text-sm text-ink/80 leading-relaxed">
+                        "While coffee consumption shows potential antioxidant benefits, <span className="bg-coral/20 text-ink font-semibold px-1 rounded">there is no clinical evidence that it acts as a cure or viable treatment for any stage of cancer.</span> Patients should not replace prescribed treatments."
+                      </p>
+                    </div>
+                    <a 
+                      href="https://www.cancer.org/research/acs-research-news/coffee-and-cancer-what-the-research-really-shows.html" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="mt-4 block text-xs font-bold text-teal hover:underline"
+                    >
+                      Full study here &rarr;
+                    </a>
                   </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Step 3: Assessment */}
+              <div className="relative">
+                <div className="absolute -left-[35px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-teal text-white">
+                  <Scale size={14} strokeWidth={3} />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-ink">Explainable Assessment</h3>
+                </div>
+                <p className="text-sm leading-relaxed text-ink/70 max-w-2xl">
+                  Major health authorities explicitly list this claim as a documented myth. The viral post relies on absolute language ("cures cancer") and artificial urgency ("Big Pharma is hiding this") without providing a verifiable source.
+                </p>
+              </div>
+
             </div>
-          )}
+          </div>
         </motion.div>
 
         {showCta && (
-          <div className="mt-8">
+          <motion.div 
+            className="mt-12 flex justify-center"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
             <Link
               href="/investigate"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-coral transition-colors hover:text-[#c14e26]"
+              className="group inline-flex items-center gap-3 text-base font-bold text-coral transition-colors hover:text-[#c14e26]"
             >
               Try it yourself
-              <ArrowRight size={16} />
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-coral/10 group-hover:bg-coral/20 transition-colors">
+                <ArrowRight size={16} className="text-coral" />
+              </span>
             </Link>
-          </div>
+          </motion.div>
         )}
       </div>
     </section>
