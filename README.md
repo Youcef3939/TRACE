@@ -116,6 +116,20 @@ TRACE can be wrong, and it's designed to say so rather than hide it:
 
 ---
 
+## features
+
+- **Multilingual Tracing**: Unlike tools that treat non-English languages as an afterthought, TRACE is built to track claims across English, French, and Arabic (including Tunisian dialect) from the start
+
+
+- **Diverse Input Support**: Users can submit URLs, pasted text, screenshots, or social media posts for investigation
+
+
+- **Sourcing Sherlock**: A side-by-side comparison view that highlights the specific sentence in a primary source that supports or contradicts the viral claim.
+
+- **Ancestry Map**: A visual timeline showing the "Game of Telephone" a claim played as it moved from an original source to a viral post, showing where context was lost
+
+- **Investigation History**: A simple log for users to track their past verifications
+
 ## Long-Term Vision
 
 Beyond the hackathon prototype:
