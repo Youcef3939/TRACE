@@ -1,8 +1,8 @@
 import Nav from "@/components/Nav";
-import Hero from "@/components/Hero";
+import HomeHero from "@/components/HomeHero";
 import HowItWorks from "@/components/HowItWorks";
+import Stats from "@/components/Stats";
 import InAction from "@/components/InAction";
-import Transparency from "@/components/Transparency";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -10,10 +10,10 @@ export default function Home() {
     <div className="flex flex-1 flex-col bg-cream">
       <Nav />
       <main className="flex-1">
-        <Hero />
+        <HomeHero />
         <HowItWorks />
-        <InAction />
-        <Transparency />
+        <InAction showCta />
+        <Stats />
       </main>
       <Footer />
     </div>

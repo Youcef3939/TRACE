@@ -1,18 +1,19 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const COLUMNS = [
   {
     title: "Product",
     links: [
-      { label: "How it works", href: "#how-it-works" },
-      { label: "Multilingual", href: "#multilingual" },
-      { label: "For educators", href: "#educators" },
+      { label: "How it works", href: "/how-it-works" },
+      { label: "Learn", href: "/learn" },
+      { label: "Investigate", href: "/investigate" },
     ],
   },
   {
     title: "Project",
     links: [
-      { label: "About", href: "#about" },
+      { label: "About", href: "/about" },
       { label: "GitHub", href: "https://github.com" },
       { label: "Contact", href: "mailto:hello@trace.org" },
     ],
@@ -21,7 +22,7 @@ const COLUMNS = [
 
 export default function Footer() {
   return (
-    <footer id="educators" className="border-t border-ink/10 bg-cream">
+    <footer className="border-t border-ink/10 bg-cream">
       <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
         <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
           <div className="max-w-sm">
@@ -38,7 +39,7 @@ export default function Footer() {
             </p>
           </div>
 
-          <div id="multilingual" className="grid grid-cols-2 gap-10 sm:gap-16">
+          <div className="grid grid-cols-2 gap-10 sm:gap-16">
             {COLUMNS.map((col) => (
               <div key={col.title}>
                 <h4 className="text-xs font-semibold uppercase tracking-wide text-ink/40">
@@ -47,12 +48,12 @@ export default function Footer() {
                 <ul className="mt-4 space-y-2.5">
                   {col.links.map((link) => (
                     <li key={link.label}>
-                      <a
+                      <Link
                         href={link.href}
                         className="text-sm text-ink/65 transition-colors hover:text-teal"
                       >
                         {link.label}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>

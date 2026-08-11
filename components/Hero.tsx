@@ -30,7 +30,7 @@ const MODES: { id: Mode; label: string; icon: typeof FileText; disabled?: boolea
   { id: "screenshot", label: "Screenshot", icon: ImageIcon, disabled: true },
 ];
 
-export default function Hero() {
+export default function Hero({ onInvestigate }: { onInvestigate?: () => void } = {}) {
   const [mode, setMode] = useState<Mode>("text");
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,9 +54,10 @@ export default function Hero() {
   const handleInvestigate = () => {
     if (!value.trim() || loading) return;
     setLoading(true);
-    // eslint-disable-next-line no-console
-    console.log("Investigate requested:", { mode, value });
-    window.setTimeout(() => setLoading(false), 1400);
+    window.setTimeout(() => {
+      setLoading(false);
+      onInvestigate?.();
+    }, 1400);
   };
 
   const handleChip = (text: string) => {
@@ -66,7 +67,7 @@ export default function Hero() {
   };
 
   return (
-    <section id="top" className="relative overflow-hidden bg-cream pt-32 pb-20 sm:pt-40 sm:pb-28">
+    <section className="relative overflow-hidden bg-cream pt-32 pb-20 sm:pt-40 sm:pb-28">
       <div
         className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full opacity-[0.06]"
         style={{ background: "radial-gradient(circle, #0F6E56 0%, transparent 70%)" }}
@@ -82,7 +83,7 @@ export default function Hero() {
           yourself, instead of just being handed a verdict.
         </p>
 
-        <div id="hero-input" className="mx-auto mt-10 max-w-2xl scroll-mt-28 text-left">
+        <div className="mx-auto mt-10 max-w-2xl text-left">
           <div className="mb-3 flex items-center gap-1.5" role="tablist" aria-label="Input mode">
             {MODES.map(({ id, label, icon: Icon, disabled }) => (
               <button

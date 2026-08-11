@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, AlertTriangle, Globe, FlaskConical, Users } from "lucide-react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ChevronDown, AlertTriangle, ArrowRight, Globe, FlaskConical, Users } from "lucide-react";
 
 const REASONING_STEPS = [
   {
@@ -21,22 +23,34 @@ const REASONING_STEPS = [
   },
 ];
 
-export default function InAction() {
+export default function InAction({ showCta = false }: { showCta?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
     <section className="bg-cream py-20 sm:py-28">
       <div className="mx-auto max-w-4xl px-5 sm:px-8">
-        <div className="max-w-2xl">
+        <motion.div
+          className="max-w-2xl"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.35 }}
+        >
           <h2 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
             See TRACE in action
           </h2>
           <p className="mt-3 text-lg text-ink/65">
             A real investigation, start to finish — every step stays visible.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mt-10 overflow-hidden rounded-2xl border-2 border-ink/10 bg-white">
+        <motion.div
+          className="mt-10 overflow-hidden rounded-2xl border-2 border-ink/10 bg-white"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.35, delay: 0.1 }}
+        >
           <div className="flex flex-col gap-4 border-b border-ink/10 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div>
               <span className="text-xs font-semibold uppercase tracking-wide text-ink/40">
@@ -80,7 +94,19 @@ export default function InAction() {
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
+
+        {showCta && (
+          <div className="mt-8">
+            <Link
+              href="/investigate"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-coral transition-colors hover:text-[#c14e26]"
+            >
+              Try it yourself
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
