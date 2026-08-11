@@ -19,8 +19,8 @@ export default function HomeHero() {
           transition={{ duration: 0.4 }}
           className="text-4xl font-bold leading-tight tracking-tight text-ink sm:text-5xl md:text-6xl"
         >
-          Your guide through the{" "}
-          <span className="text-teal">information noise</span>
+          When truth is lost,{" "}
+          <span className="text-teal">TRACE your steps</span>
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -28,8 +28,7 @@ export default function HomeHero() {
           transition={{ duration: 0.4, delay: 0.1 }}
           className="mx-auto mt-5 max-w-2xl text-lg text-ink/70 sm:text-xl"
         >
-          TRACE walks you through the evidence so you can investigate a claim
-          yourself, instead of just being handed a verdict.
+          Traditional fact-checkers tell you what to think. We show you how. Don't just take our word for it, investigate the evidence yourself.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
