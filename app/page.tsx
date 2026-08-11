@@ -1,5 +1,6 @@
 import Nav from "@/components/Nav";
 import HomeHero from "@/components/HomeHero";
+import ScrollRevealParagraph from "@/components/ScrollRevealParagraph";
 import HowItWorks from "@/components/HowItWorks";
 import Stats from "@/components/Stats";
 import InAction from "@/components/InAction";
@@ -11,6 +12,7 @@ export default function Home() {
       <Nav />
       <main className="flex-1">
         <HomeHero />
+        <ScrollRevealParagraph />
         <HowItWorks />
         <InAction showCta />
         <Stats />
