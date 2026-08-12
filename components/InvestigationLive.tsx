@@ -218,6 +218,22 @@ export default function InvestigationLive({ state }: { state: RunState }) {
           </div>
         )}
 
+        {state.phase === "complete" && state.claims.length === 0 && !state.fatalError && (
+          <div className="rounded-3xl border-2 border-ink/10 bg-white p-8 text-center">
+            <HelpCircle size={22} className="mx-auto mb-3 text-teal" />
+            <p className="text-base font-semibold text-ink">No checkable claim found</p>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink/60">
+              TRACE couldn&apos;t find a specific, checkable factual claim in this text — opinions,
+              questions, and speculation aren&apos;t things evidence can confirm or refute. TRACE looks
+              for statements that assert something about the world.
+            </p>
+            <p className="mx-auto mt-3 max-w-md text-sm text-ink/50">
+              Try pasting a specific statement instead — e.g. &ldquo;Coffee cures cancer&rdquo; rather
+              than a question or opinion.
+            </p>
+          </div>
+        )}
+
         <div className="space-y-6">
           {state.claims.map((claim, i) => {
             const bothSettled = claim.traceSource.status !== "pending" && claim.retrieveEvidence.status !== "pending";
