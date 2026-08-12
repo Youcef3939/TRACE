@@ -8,6 +8,9 @@ export interface Investigation {
   claims: Claim[];
   createdAt: Date;
   userId?: string;
+  totalClaimsFound: number;   // how many checkable claims extraction found, before any cap was applied
+  claimsCapped: boolean;      // true if totalClaimsFound > claims.length
+  capNotice: string | null;   // UI-facing copy explaining the cap, null when not capped
 }
 
 export interface Claim {

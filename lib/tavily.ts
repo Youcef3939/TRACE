@@ -16,7 +16,7 @@ export async function searchWeb(query: string, searchDepth: 'basic' | 'advanced'
       search_depth: searchDepth,
       include_answer: false,
       include_images: false,
-      include_raw_content: true,
+      include_raw_content: false,
       max_results: maxResults,
     }),
   });
