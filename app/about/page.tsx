@@ -27,6 +27,17 @@ export default function AboutPage() {
           </div>
         </section>
 
+        <section className="bg-cream pt-8 pb-12 sm:pt-12">
+          <div className="mx-auto max-w-3xl px-5 text-center sm:px-8 space-y-6 text-lg text-ink/75 leading-relaxed">
+            <p>
+              We started TRACE during the MIL Hackathon 2026 with a single, urgent realization: traditional fact-checking is losing the war against modern misinformation because it leaves the user passive. Lies spread fast because they are highly engineered for emotion, while the truth gets buried behind boring, black-box verdicts.
+            </p>
+            <p>
+              Our platform is built to shift the power dynamic. TRACE pulls back the curtain on the anatomy of viral rumors, mapping out evidence out loud so young digital citizens can build permanent, unshakeable media literacy habits.
+            </p>
+          </div>
+        </section>
+
         <TeamSection />
         <Transparency />
 
