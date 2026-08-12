@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { AlertTriangle, CheckCircle2, HelpCircle, Search, FileSearch, Scale, Loader2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, HelpCircle, Search, FileSearch, Scale, Loader2, Sparkles } from "lucide-react";
 import type { Assessment, Claim, Evidence, SourceTrace } from "@/types/trace";
 
 export type StageState<T> =
@@ -9,12 +9,15 @@ export type StageState<T> =
   | { status: "done"; data: T }
   | { status: "error"; error: string };
 
+export type Guess = "true" | "misleading";
+
 export interface ClaimRunState {
   text: string;
   originalContext: string;
   traceSource: StageState<SourceTrace>;
   retrieveEvidence: StageState<number>; // just the count of sources found
   assess: StageState<Claim>;
+  guess: Guess | "skipped" | null;
 }
 
 export interface RunState {
@@ -109,7 +112,53 @@ function RetrieveEvidenceStep({ state }: { state: StageState<number> }) {
   );
 }
 
-function AssessStep({ state, locked }: { state: StageState<Claim>; locked: boolean }) {
+/**
+ * Maps a verdict label to whether it agrees with a "true" or "misleading" gut guess.
+ * Returns null for verdicts that are inherently ambiguous relative to a binary guess
+ * (unverifiable / insufficient_evidence) — those shouldn't be scored as a match or a miss.
+ */
+export function guessMatchesVerdict(guess: Guess, label: Assessment["label"]): boolean | null {
+  if (label === "well_supported") return guess === "true";
+  if (label === "misleading" || label === "questionable") return guess === "misleading";
+  return null;
+}
+
+const GUESS_COPY: Record<Guess, string> = {
+  true: "looked true",
+  misleading: "looked misleading",
+};
+
+function GuessComparison({ guess, label }: { guess: Guess; label: Assessment["label"] }) {
+  const match = guessMatchesVerdict(guess, label);
+  const verdictText = LABEL_STYLE[label].text.toLowerCase();
+
+  if (match === null) {
+    return (
+      <div className="mb-4 rounded-xl bg-ink/5 p-3 text-sm text-ink/60">
+        You guessed this {GUESS_COPY[guess]}. TRACE couldn&apos;t reach a confident verdict here, so
+        there&apos;s no clean match or miss to score — see why below.
+      </div>
+    );
+  }
+
+  if (match) {
+    return (
+      <div className="mb-4 flex items-start gap-2 rounded-xl bg-teal/5 p-3 text-sm text-ink/70">
+        <Sparkles size={16} className="mt-0.5 shrink-0 text-teal" />
+        <span>Your instinct was right — here&apos;s the evidence that confirms it.</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-4 rounded-xl bg-ink/5 p-3 text-sm text-ink/70">
+      You guessed this {GUESS_COPY[guess]}. TRACE found it {verdictText}. Here&apos;s exactly what
+      changed the picture:
+    </div>
+  );
+}
+
+function AssessStep({ state, locked, guess }: { state: StageState<Claim>; locked: boolean; guess: Guess | "skipped" | null }) {
   if (locked) {
     return <p className="text-sm text-ink/40">Locked until source tracing and evidence gathering finish.</p>;
   }
@@ -130,6 +179,7 @@ function AssessStep({ state, locked }: { state: StageState<Claim>; locked: boole
 
   return (
     <div className="space-y-4">
+      {(guess === "true" || guess === "misleading") && <GuessComparison guess={guess} label={assessment.label} />}
       <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-bold ${style.badge}`}>
         <StyleIcon size={15} strokeWidth={2.5} />
         {style.text}
@@ -177,15 +227,61 @@ function AssessStep({ state, locked }: { state: StageState<Claim>; locked: boole
   );
 }
 
-export default function InvestigationLive({ state }: { state: RunState }) {
+function GuessGate({ onGuess }: { onGuess: (guess: Guess | "skipped") => void }) {
+  return (
+    <div className="p-6 text-center sm:p-8">
+      <p className="text-base font-semibold text-ink">Before TRACE investigates — what&apos;s your gut read?</p>
+      <div className="mt-4 flex flex-wrap justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => onGuess("true")}
+          className="rounded-full border-2 border-ink/15 bg-white px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-ink/30 cursor-pointer"
+        >
+          Looks true to me
+        </button>
+        <button
+          type="button"
+          onClick={() => onGuess("misleading")}
+          className="rounded-full border-2 border-ink/15 bg-white px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-ink/30 cursor-pointer"
+        >
+          Looks misleading to me
+        </button>
+      </div>
+      <button
+        type="button"
+        onClick={() => onGuess("skipped")}
+        className="mt-4 text-xs font-medium text-ink/40 underline decoration-ink/20 underline-offset-2 hover:text-ink/60 cursor-pointer"
+      >
+        Skip — just show me
+      </button>
+    </div>
+  );
+}
+
+export default function InvestigationLive({
+  state,
+  onGuess,
+  sessionTally,
+}: {
+  state: RunState;
+  onGuess: (claimIndex: number, guess: Guess | "skipped") => void;
+  sessionTally: { attempted: number; matched: number };
+}) {
   if (state.phase === "idle") return null;
 
   return (
     <section className="bg-cream py-16 sm:py-20 text-ink">
       <div className="mx-auto max-w-5xl px-5 sm:px-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <span className="font-mono text-xs uppercase tracking-widest text-ink/40">
-            {state.phase === "complete" ? "Investigation complete" : "Investigating…"}
+          <span className="flex items-center gap-3">
+            <span className="font-mono text-xs uppercase tracking-widest text-ink/40">
+              {state.phase === "complete" ? "Investigation complete" : "Investigating…"}
+            </span>
+            {sessionTally.attempted > 0 && (
+              <span className="rounded-full bg-ink/5 px-2.5 py-1 text-xs font-medium text-ink/50">
+                {sessionTally.matched}/{sessionTally.attempted} guesses matched TRACE
+              </span>
+            )}
           </span>
           {state.phase !== "complete" && state.phase !== "fatal" && (
             <span className="flex items-center gap-2 text-xs text-ink/40">
@@ -246,21 +342,25 @@ export default function InvestigationLive({ state }: { state: RunState }) {
                   <p className="mt-2 text-xl font-semibold text-ink sm:text-2xl">&ldquo;{claim.text}&rdquo;</p>
                 </div>
 
-                <div className="p-6 sm:p-8">
-                  <div className="relative border-l-2 border-ink/10 pl-6 space-y-10">
-                    <StepShell icon={Search} title="Source tracing" locked={false}>
-                      <TraceSourceStep state={claim.traceSource} />
-                    </StepShell>
+                {claim.guess === null ? (
+                  <GuessGate onGuess={(guess) => onGuess(i, guess)} />
+                ) : (
+                  <div className="p-6 sm:p-8">
+                    <div className="relative border-l-2 border-ink/10 pl-6 space-y-10">
+                      <StepShell icon={Search} title="Source tracing" locked={false}>
+                        <TraceSourceStep state={claim.traceSource} />
+                      </StepShell>
 
-                    <StepShell icon={FileSearch} title="Gather evidence" locked={false}>
-                      <RetrieveEvidenceStep state={claim.retrieveEvidence} />
-                    </StepShell>
+                      <StepShell icon={FileSearch} title="Gather evidence" locked={false}>
+                        <RetrieveEvidenceStep state={claim.retrieveEvidence} />
+                      </StepShell>
 
-                    <StepShell icon={Scale} title="Assess" locked={!bothSettled}>
-                      <AssessStep state={claim.assess} locked={!bothSettled} />
-                    </StepShell>
+                      <StepShell icon={Scale} title="Assess" locked={!bothSettled}>
+                        <AssessStep state={claim.assess} locked={!bothSettled} guess={claim.guess} />
+                      </StepShell>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             );
           })}
