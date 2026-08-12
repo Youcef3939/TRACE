@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FileText, Link2, ImageIcon, ArrowRight, Loader2 } from "lucide-react";
+import { FileText, Link2, ImageIcon, ArrowRight, Loader2, UploadCloud } from "lucide-react";
+import { createWorker } from "tesseract.js";
 
 type Mode = "text" | "url" | "screenshot";
 
-const PLACEHOLDERS: Record<Exclude<Mode, "screenshot">, string[]> = {
+const PLACEHOLDERS: Record<Mode, string[]> = {
   text: [
     "Paste a claim...",
     "\"Drinking celery juice reverses diabetes\"",
@@ -15,6 +16,11 @@ const PLACEHOLDERS: Record<Exclude<Mode, "screenshot">, string[]> = {
     "Paste a URL...",
     "https://example.com/news/breaking-story",
     "https://example.com/article/health-claim",
+  ],
+  screenshot: [
+    "Paste an image (Ctrl+V)",
+    "Click here to upload a screenshot",
+    "Drag and drop an image of a claim",
   ],
 };
 
@@ -27,7 +33,7 @@ const EXAMPLE_CHIPS = [
 const MODES: { id: Mode; label: string; icon: typeof FileText; disabled?: boolean }[] = [
   { id: "text", label: "Text", icon: FileText },
   { id: "url", label: "URL", icon: Link2 },
-  { id: "screenshot", label: "Screenshot", icon: ImageIcon, disabled: true },
+  { id: "screenshot", label: "Screenshot", icon: ImageIcon },
 ];
 
 export default function Hero({
@@ -37,13 +43,11 @@ export default function Hero({
   const [mode, setMode] = useState<Mode>("text");
   const [value, setValue] = useState("");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [extracting, setExtracting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const placeholders = useMemo(
-    () => (mode === "screenshot" ? ["Screenshot upload coming soon"] : PLACEHOLDERS[mode]),
-    [mode]
-  );
-
+  const placeholders = useMemo(() => PLACEHOLDERS[mode], [mode]);
   const safePlaceholderIndex = placeholderIndex % placeholders.length;
 
   useEffect(() => {
@@ -55,7 +59,7 @@ export default function Hero({
   }, [placeholders]);
 
   const handleInvestigate = () => {
-    if (!value.trim() || loading) return;
+    if (!value.trim() || loading || extracting) return;
     onInvestigate?.(value);
   };
 
@@ -63,6 +67,56 @@ export default function Hero({
     setMode("text");
     setValue(text);
     textareaRef.current?.focus();
+  };
+
+  const handleImage = async (file: File) => {
+    if (!file.type.startsWith("image/")) return;
+    setExtracting(true);
+    setMode("text"); // switch to text mode to show the extracted result later
+    setValue("");
+    
+    try {
+      // Create a local worker (downloads necessary webassembly & language data on first run)
+      const worker = await createWorker('eng');
+      
+      // Tesseract handles File objects directly in the browser
+      const { data: { text } } = await worker.recognize(file);
+      await worker.terminate();
+      
+      if (!text || !text.trim()) {
+        setValue("[No legible text could be extracted from this image.]");
+      } else {
+        setValue(text.trim());
+      }
+    } catch (err) {
+      console.error(err);
+      setValue("[Error extracting text from image. Please try again.]\n\nDetails: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setExtracting(false);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) handleImage(file);
+        break;
+      }
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith("image/")) {
+        handleImage(file);
+      }
+    }
   };
 
   return (
@@ -111,26 +165,59 @@ export default function Hero({
             ))}
           </div>
 
-          <div className="rounded-2xl border-2 border-ink/10 bg-white p-3 shadow-[0_2px_0_0_rgba(20,35,29,0.06)] transition-colors focus-within:border-teal sm:p-4">
-            <textarea
-              ref={textareaRef}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              rows={mode === "url" ? 2 : 4}
-              disabled={mode === "screenshot"}
-              placeholder={placeholders[safePlaceholderIndex]}
-              className="w-full resize-none bg-transparent text-lg text-ink placeholder:text-ink/35 focus:outline-none disabled:cursor-not-allowed"
-            />
+          <div 
+            className="relative rounded-2xl border-2 border-ink/10 bg-white p-3 shadow-[0_2px_0_0_rgba(20,35,29,0.06)] transition-colors focus-within:border-teal sm:p-4"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+            {extracting ? (
+              <div className="flex h-[96px] w-full flex-col items-center justify-center gap-3 text-ink/60">
+                <Loader2 size={24} className="animate-spin text-teal" />
+                <span className="text-sm font-medium">Extracting text from screenshot...</span>
+              </div>
+            ) : mode === "screenshot" ? (
+              <div 
+                className="flex h-[96px] w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ink/20 bg-cream/50 transition-colors hover:border-teal/50 hover:bg-teal/5"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <UploadCloud size={24} className="text-teal" />
+                <span className="text-sm font-medium text-ink/60">
+                  {placeholders[safePlaceholderIndex]}
+                </span>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/png, image/jpeg, image/webp"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      handleImage(e.target.files[0]);
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <textarea
+                ref={textareaRef}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onPaste={handlePaste}
+                rows={mode === "url" ? 2 : 4}
+                placeholder={placeholders[safePlaceholderIndex]}
+                className="w-full resize-none bg-transparent text-lg text-ink placeholder:text-ink/35 focus:outline-none"
+              />
+            )}
+
             <div className="mt-2 flex items-center justify-between gap-3">
               <span className="text-xs text-ink/40">
                 {mode === "screenshot"
-                  ? "Screenshot analysis is coming soon."
+                  ? "We'll convert your screenshot to text so you can review it first."
                   : "Press Investigate to start — nothing is submitted until you click."}
               </span>
               <button
                 type="button"
                 onClick={handleInvestigate}
-                disabled={!value.trim() || loading || mode === "screenshot"}
+                disabled={!value.trim() || loading || extracting || mode === "screenshot"}
                 className="flex shrink-0 items-center gap-2 rounded-full bg-coral px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-[#c14e26] disabled:cursor-not-allowed disabled:bg-ink/15 disabled:text-ink/40 cursor-pointer"
               >
                 {loading ? (
