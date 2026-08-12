@@ -30,10 +30,12 @@ const MODES: { id: Mode; label: string; icon: typeof FileText; disabled?: boolea
   { id: "screenshot", label: "Screenshot", icon: ImageIcon, disabled: true },
 ];
 
-export default function Hero({ onInvestigate }: { onInvestigate?: () => void } = {}) {
+export default function Hero({
+  onInvestigate,
+  loading = false,
+}: { onInvestigate?: (text: string) => void; loading?: boolean } = {}) {
   const [mode, setMode] = useState<Mode>("text");
   const [value, setValue] = useState("");
-  const [loading, setLoading] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -42,8 +44,9 @@ export default function Hero({ onInvestigate }: { onInvestigate?: () => void } =
     [mode]
   );
 
+  const safePlaceholderIndex = placeholderIndex % placeholders.length;
+
   useEffect(() => {
-    setPlaceholderIndex(0);
     if (placeholders.length <= 1) return;
     const interval = setInterval(() => {
       setPlaceholderIndex((i) => (i + 1) % placeholders.length);
@@ -53,11 +56,7 @@ export default function Hero({ onInvestigate }: { onInvestigate?: () => void } =
 
   const handleInvestigate = () => {
     if (!value.trim() || loading) return;
-    setLoading(true);
-    window.setTimeout(() => {
-      setLoading(false);
-      onInvestigate?.();
-    }, 1400);
+    onInvestigate?.(value);
   };
 
   const handleChip = (text: string) => {
@@ -119,7 +118,7 @@ export default function Hero({ onInvestigate }: { onInvestigate?: () => void } =
               onChange={(e) => setValue(e.target.value)}
               rows={mode === "url" ? 2 : 4}
               disabled={mode === "screenshot"}
-              placeholder={placeholders[placeholderIndex]}
+              placeholder={placeholders[safePlaceholderIndex]}
               className="w-full resize-none bg-transparent text-lg text-ink placeholder:text-ink/35 focus:outline-none disabled:cursor-not-allowed"
             />
             <div className="mt-2 flex items-center justify-between gap-3">
