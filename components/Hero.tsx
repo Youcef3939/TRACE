@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { FileText, Link2, ImageIcon, ArrowRight, Loader2, UploadCloud } from "lucide-react";
 import { createWorker } from "tesseract.js";
 
@@ -127,16 +128,31 @@ export default function Hero({
         aria-hidden
       />
       <div className="mx-auto max-w-4xl px-5 text-center sm:px-8">
-        <h1 className="text-4xl font-bold leading-tight tracking-tight text-ink sm:text-5xl md:text-6xl">
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="text-4xl font-bold leading-tight tracking-tight text-ink sm:text-5xl md:text-6xl"
+        >
           Your guide through the{" "}
           <span className="text-teal">information noise</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-lg text-ink/70 sm:text-xl">
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="mx-auto mt-5 max-w-2xl text-lg text-ink/70 sm:text-xl"
+        >
           TRACE walks you through the evidence so you can investigate a claim
           yourself, instead of just being handed a verdict.
-        </p>
+        </motion.p>
 
-        <div className="mx-auto mt-10 max-w-2xl text-left">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="mx-auto mt-10 max-w-2xl text-left"
+        >
           <div className="mb-3 flex items-center gap-1.5" role="tablist" aria-label="Input mode">
             {MODES.map(({ id, label, icon: Icon, disabled }) => (
               <button
@@ -248,7 +264,7 @@ export default function Hero({
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { motion } from "framer-motion";
 import { AlertTriangle, CheckCircle2, HelpCircle, Search, FileSearch, Scale, Loader2, Sparkles } from "lucide-react";
 import type { Assessment, Claim, Evidence, SourceTrace } from "@/types/trace";
 
@@ -293,18 +294,28 @@ export default function InvestigationLive({
         </div>
 
         {state.fatalError && (
-          <div className="mb-6 rounded-2xl border-2 border-coral/30 bg-coral/5 p-5">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="mb-6 rounded-2xl border-2 border-coral/30 bg-coral/5 p-5"
+          >
             <p className="flex items-center gap-2 text-sm font-semibold text-coral">
               <AlertTriangle size={16} /> This investigation hit a problem
             </p>
             <p className="mt-1 text-sm text-ink/60">{state.fatalError}</p>
-          </div>
+          </motion.div>
         )}
 
         {state.capNotice && (
-          <div className="mb-6 rounded-2xl border-2 border-ink/10 bg-white p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="mb-6 rounded-2xl border-2 border-ink/10 bg-white p-4"
+          >
             <p className="text-sm text-ink/70">{state.capNotice}</p>
-          </div>
+          </motion.div>
         )}
 
         {state.phase === "extracting" && (
@@ -315,7 +326,12 @@ export default function InvestigationLive({
         )}
 
         {state.phase === "complete" && state.claims.length === 0 && !state.fatalError && (
-          <div className="rounded-3xl border-2 border-ink/10 bg-white p-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="rounded-3xl border-2 border-ink/10 bg-white p-8 text-center"
+          >
             <HelpCircle size={22} className="mx-auto mb-3 text-teal" />
             <p className="text-base font-semibold text-ink">No checkable claim found</p>
             <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink/60">
@@ -327,14 +343,20 @@ export default function InvestigationLive({
               Try pasting a specific statement instead — e.g. &ldquo;Coffee cures cancer&rdquo; rather
               than a question or opinion.
             </p>
-          </div>
+          </motion.div>
         )}
 
         <div className="space-y-6">
           {state.claims.map((claim, i) => {
             const bothSettled = claim.traceSource.status !== "pending" && claim.retrieveEvidence.status !== "pending";
             return (
-              <div key={i} className="relative overflow-hidden rounded-3xl border-2 border-ink/10 bg-white shadow-xl">
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="relative overflow-hidden rounded-3xl border-2 border-ink/10 bg-white shadow-xl"
+              >
                 <div className="border-b border-ink/10 p-6 sm:p-8">
                   <span className="font-mono text-xs uppercase tracking-widest text-ink/40">
                     {"// CLAIM_"}{i + 1}
@@ -361,7 +383,7 @@ export default function InvestigationLive({
                     </div>
                   </div>
                 )}
-              </div>
+              </motion.div>
             );
           })}
         </div>

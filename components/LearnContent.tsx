@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import PageHero from "./PageHero";
 import {
   Megaphone,
   FileQuestion,
@@ -47,17 +48,15 @@ const container = {
 export default function LearnContent() {
   return (
     <>
-      <section className="bg-cream pt-24 pb-8 sm:pt-32">
-        <div className="mx-auto max-w-3xl px-5 text-center sm:px-8">
-          <h1 className="text-4xl font-bold tracking-tight text-ink sm:text-5xl">
-            Spot it before you share it
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-lg text-ink/70">
+      <PageHero
+        title="Spot it before you share it"
+        description={
+          <>
             You don&rsquo;t need a tool to catch most manipulation — you need
             to know what to look for. Here&rsquo;s where to start.
-          </p>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
@@ -136,7 +135,7 @@ export default function LearnContent() {
           variants={fadeUp}
           className="mx-auto max-w-2xl px-5 text-center sm:px-8"
         >
-          <h2 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+          <h2 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
             Ready to practice?
           </h2>
           <p className="mt-3 text-lg text-ink/65">

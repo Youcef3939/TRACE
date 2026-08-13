@@ -56,7 +56,7 @@ export default function HowItWorks() {
                   <span className="text-xs font-semibold text-coral">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <h3 className="text-base font-semibold text-ink">{label}</h3>
+                  <h3 className="text-lg font-semibold text-ink">{label}</h3>
                 </div>
                 <p className="mt-1 text-sm leading-snug text-ink/60">{description}</p>
               </div>

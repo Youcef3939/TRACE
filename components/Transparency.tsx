@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { Lock, Unlock, Check } from "lucide-react";
 
 const REASONING_LINES = [
@@ -7,11 +10,27 @@ const REASONING_LINES = [
   "Flagged as a myth by health authorities",
 ];
 
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12 } },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+};
+
 export default function Transparency() {
   return (
     <section id="about" className="bg-cream py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="max-w-2xl">
+        <motion.div
+          className="max-w-2xl"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.35 }}
+        >
           <h2 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
             Why transparency wins
           </h2>
@@ -19,10 +38,16 @@ export default function Transparency() {
             A score tells you what to think. A reasoning chain lets you check
             it yourself.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border-2 border-ink/10 bg-white p-8">
+        <motion.div
+          className="mt-12 grid gap-6 lg:grid-cols-2"
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <motion.div variants={item} className="rounded-2xl border-2 border-ink/10 bg-white p-8">
             <div className="flex items-center gap-2 text-ink/40">
               <Lock size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">
@@ -38,9 +63,9 @@ export default function Transparency() {
               the score or you don&rsquo;t — there&rsquo;s nothing to
               check, question, or learn from.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="rounded-2xl border-2 border-teal bg-white p-8">
+          <motion.div variants={item} className="rounded-2xl border-2 border-teal bg-white p-8">
             <div className="flex items-center gap-2 text-teal">
               <Unlock size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">
@@ -66,8 +91,8 @@ export default function Transparency() {
               Every step is visible and sourced, so you can verify the
               reasoning, disagree with a step, or dig deeper on your own.
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

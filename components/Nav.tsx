@@ -66,7 +66,7 @@ export default function Nav() {
         <div className="hidden md:block">
           <Link
             href="/investigate"
-            className="rounded-full bg-teal px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-teal-dark"
+            className="rounded-full bg-coral px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-[#c14e26]"
           >
             Start investigating
           </Link>
@@ -104,7 +104,7 @@ export default function Nav() {
             <Link
               href="/investigate"
               onClick={() => setOpen(false)}
-              className="mt-3 rounded-full bg-teal px-5 py-3 text-center text-base font-semibold text-cream hover:bg-teal-dark"
+              className="mt-3 rounded-full bg-coral px-5 py-3 text-center text-base font-semibold text-cream hover:bg-[#c14e26]"
             >
               Start investigating
             </Link>

@@ -76,7 +76,7 @@ export default function TeamSection() {
             <motion.div
               key={name}
               variants={item}
-              className="flex flex-col gap-6 rounded-3xl border-2 border-ink/10 bg-white p-8 sm:flex-row shadow-sm hover:shadow-md transition-shadow"
+              className="flex flex-col gap-6 rounded-2xl border-2 border-ink/10 bg-white p-8 sm:flex-row"
             >
               <div className="shrink-0">
                 <div className="relative h-24 w-24 overflow-hidden rounded-2xl border border-ink/10 bg-cream">
