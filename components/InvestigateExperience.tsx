@@ -119,7 +119,7 @@ export default function InvestigateExperience() {
     });
   };
 
-  const handleInvestigate = async (text: string) => {
+  const handleInvestigate = async (text: string, mode: "text" | "url") => {
     startedAtRef.current = Date.now();
     runIdRef.current += 1;
     setState({ ...IDLE_STATE, phase: "extracting" });
@@ -128,7 +128,7 @@ export default function InvestigateExperience() {
       const res = await fetch("/api/investigate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: text, language: "en" }),
+        body: JSON.stringify({ input: text, language: "en", mode }),
       });
 
       if (!res.ok || !res.body) {

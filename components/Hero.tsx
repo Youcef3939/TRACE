@@ -33,7 +33,7 @@ const MODES: { id: Mode; label: string; icon: typeof FileText; disabled?: boolea
 export default function Hero({
   onInvestigate,
   loading = false,
-}: { onInvestigate?: (text: string) => void; loading?: boolean } = {}) {
+}: { onInvestigate?: (text: string, mode: "text" | "url") => void; loading?: boolean } = {}) {
   const [mode, setMode] = useState<Mode>("text");
   const [value, setValue] = useState("");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
@@ -55,8 +55,8 @@ export default function Hero({
   }, [placeholders]);
 
   const handleInvestigate = () => {
-    if (!value.trim() || loading) return;
-    onInvestigate?.(value);
+    if (!value.trim() || loading || mode === "screenshot") return;
+    onInvestigate?.(value, mode);
   };
 
   const handleChip = (text: string) => {

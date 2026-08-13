@@ -1,3 +1,73 @@
+const MIN_EXTRACTED_CONTENT_CHARS = 200;
+
+/**
+ * Tavily's raw_content keeps every markdown link on the page, including nav menus, tables of
+ * contents, and (on Wikipedia especially) hundreds of interlanguage-link bullets before the
+ * article text even starts. Left in, these can eat the entire truncation budget downstream
+ * without a single real sentence surviving. Strip lines that are nothing but a link bullet —
+ * real prose essentially never takes that exact shape, so this is safe across most sites.
+ */
+function stripLinkListBoilerplate(text: string): string {
+  return text
+    .split('\n')
+    .filter((line) => !/^[*+-]\s*\[[^\]]*\]\([^)]*\)(\s*"[^"]*")?\s*$/.test(line.trim()))
+    .join('\n');
+}
+
+/**
+ * Fetches and returns the cleaned main text of a web page via Tavily's Extract API.
+ * Throws a descriptive Error for every failure mode the caller needs to distinguish:
+ * malformed URL, unreachable/blocked page, or a page with no real readable content.
+ */
+export async function extractUrlContent(url: string): Promise<string> {
+  const apiKey = process.env.TAVILY_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('TAVILY_API_KEY is not set');
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error("That doesn't look like a valid URL.");
+  }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error('Only http:// and https:// URLs are supported.');
+  }
+
+  const response = await fetch('https://api.tavily.com/extract', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      api_key: apiKey,
+      urls: [url],
+      include_images: false,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Tavily extract request failed: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  const failure = data.failed_results?.[0];
+  if (failure) {
+    throw new Error(`That page couldn't be fetched (${failure.error || 'unreachable'}).`);
+  }
+
+  const rawContent: string = data.results?.[0]?.raw_content ?? '';
+  const content = stripLinkListBoilerplate(rawContent);
+  if (content.trim().length < MIN_EXTRACTED_CONTENT_CHARS) {
+    throw new Error("That page didn't have enough readable text to investigate.");
+  }
+
+  return content;
+}
+
 export async function searchWeb(query: string, searchDepth: 'basic' | 'advanced' = 'advanced', maxResults: number = 5) {
   const apiKey = process.env.TAVILY_API_KEY;
   
