@@ -1,12 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
+import CountUp from "./CountUp";
 
 const STATS = [
-  { value: "6", label: "steps per investigation" },
-  { value: "3", label: "languages supported" },
-  { value: "0", label: "black-box scores" },
-  { value: "100%", label: "of reasoning shown" },
+  { value: 6, suffix: "", label: "steps per investigation" },
+  { value: 3, suffix: "", label: "languages supported" },
+  { value: 0, suffix: "", label: "black-box scores" },
+  { value: 100, suffix: "%", label: "of reasoning shown" },
 ];
 
 const container = {
@@ -32,7 +33,7 @@ export default function Stats() {
         {STATS.map((stat) => (
           <motion.div key={stat.label} variants={item} className="text-center lg:text-left">
             <div className="text-5xl font-bold tracking-tight text-teal sm:text-6xl">
-              {stat.value}
+              <CountUp to={stat.value} suffix={stat.suffix} duration={1.4} />
             </div>
             <div className="mt-2 text-sm font-medium text-ink/55">{stat.label}</div>
           </motion.div>
