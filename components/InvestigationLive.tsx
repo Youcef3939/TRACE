@@ -2,12 +2,24 @@
 
 import type { ReactNode, RefObject } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle, CheckCircle2, HelpCircle, Search, FileSearch, Scale, Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Check, X, Minus } from "lucide-react";
 import type { Assessment, Claim, Evidence, SourceTrace } from "@/types/trace";
 import { describeSignal } from "@/lib/manipulationSignals";
 import InfoTooltip from "./InfoTooltip";
 import HighlightedText from "./HighlightedText";
 import VerifyChecklist from "./VerifyChecklist";
+import {
+  type StageStatus,
+  DoneMark,
+  ExtractGlyph,
+  TraceGlyph,
+  EvidenceGlyph,
+  AssessGlyph,
+  GuessGateGlyph,
+  EmptyStateGlyph,
+  ErrorGlyph,
+  VerdictGlyph,
+} from "./illustrations/StageIcons";
 
 export type StageState<T> =
   | { status: "pending" }
@@ -34,12 +46,12 @@ export interface RunState {
   elapsedMs: number;
 }
 
-const LABEL_STYLE: Record<Assessment["label"], { badge: string; text: string; icon: typeof CheckCircle2 }> = {
-  well_supported: { badge: "bg-teal/10 text-teal", text: "Well supported", icon: CheckCircle2 },
-  misleading: { badge: "bg-coral/10 text-coral", text: "Misleading", icon: AlertTriangle },
-  questionable: { badge: "bg-coral/10 text-coral", text: "Questionable", icon: AlertTriangle },
-  unverifiable: { badge: "bg-ink/10 text-ink/60", text: "Unverifiable", icon: HelpCircle },
-  insufficient_evidence: { badge: "bg-ink/10 text-ink/60", text: "Insufficient evidence", icon: HelpCircle },
+const LABEL_STYLE: Record<Assessment["label"], { badge: string; text: string }> = {
+  well_supported: { badge: "bg-teal/10 text-teal", text: "Well supported" },
+  misleading: { badge: "bg-coral/10 text-coral", text: "Misleading" },
+  questionable: { badge: "bg-coral/10 text-coral", text: "Questionable" },
+  unverifiable: { badge: "bg-ink/10 text-ink/60", text: "Unverifiable" },
+  insufficient_evidence: { badge: "bg-ink/10 text-ink/60", text: "Insufficient evidence" },
 };
 
 const STANCE_STYLE: Record<Evidence["stance"], string> = {
@@ -54,26 +66,42 @@ function formatElapsed(ms: number) {
   return `${s}s`;
 }
 
+/** Maps a pipeline stage's raw state to the shared visual vocabulary the stage glyphs render against. */
+function stageStatus<T>(state: StageState<T>): StageStatus {
+  if (state.status === "error") return "error";
+  if (state.status === "done") return "done";
+  return "active";
+}
+
+const STATUS_CIRCLE: Record<StageStatus, string> = {
+  locked: "bg-ink/20",
+  active: "bg-teal",
+  done: "bg-teal",
+  error: "bg-coral",
+};
+
 function StepShell({
   icon: Icon,
   title,
-  locked,
+  status,
   children,
 }: {
-  icon: typeof Search;
+  icon: (props: { status: StageStatus; size?: number }) => ReactNode;
   title: string;
-  locked: boolean;
+  status: StageStatus;
   children: ReactNode;
 }) {
+  const locked = status === "locked";
   return (
     <div className={`relative transition-opacity ${locked ? "opacity-40" : "opacity-100"}`}>
-      <div
-        className={`absolute -left-[35px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-white ${
-          locked ? "bg-ink/30" : "bg-teal"
-        }`}
+      <motion.div
+        className={`absolute -left-[35px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-white ${STATUS_CIRCLE[status]}`}
+        animate={status === "done" ? { scale: [1, 1.28, 1] } : { scale: 1 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
       >
-        <Icon size={14} strokeWidth={3} />
-      </div>
+        <Icon status={status} size={14} />
+        {status === "done" && <DoneMark size={12} />}
+      </motion.div>
       <h3 className="mb-2 text-lg font-semibold text-ink">{title}</h3>
       {children}
     </div>
@@ -133,37 +161,103 @@ const GUESS_COPY: Record<Guess, string> = {
   misleading: "looked misleading",
 };
 
-function GuessComparison({ guess, label }: { guess: Guess; label: Assessment["label"] }) {
+const GUESS_BADGE_TEXT: Record<Guess, string> = {
+  true: "Looked true",
+  misleading: "Looked misleading",
+};
+
+/**
+ * The payoff moment of the guess-before-reveal mechanic: the user's gut read and TRACE's verdict
+ * slide in from opposite sides and collide in the middle, where a connector glyph resolves the
+ * comparison (check for a match, x for a miss, dash when the verdict is too ambiguous to score).
+ */
+function GuessVerdictReveal({ guess, label }: { guess: Guess; label: Assessment["label"] }) {
   const match = guessMatchesVerdict(guess, label);
   const verdictText = LABEL_STYLE[label].text.toLowerCase();
 
-  if (match === null) {
-    return (
-      <div className="mb-4 rounded-xl bg-ink/5 p-3 text-sm text-ink/60">
-        You guessed this {GUESS_COPY[guess]}. TRACE couldn&apos;t reach a confident verdict here, so
-        there&apos;s no clean match or miss to score — see why below.
-      </div>
-    );
-  }
-
-  if (match) {
-    return (
-      <div className="mb-4 flex items-start gap-2 rounded-xl bg-teal/5 p-3 text-sm text-ink/70">
-        <Sparkles size={16} className="mt-0.5 shrink-0 text-teal" />
-        <span>Your instinct was right — here&apos;s the evidence that confirms it.</span>
-      </div>
-    );
-  }
+  const connectorStyle =
+    match === true ? "bg-teal text-cream" : match === false ? "bg-coral text-cream" : "bg-ink/15 text-ink/50";
+  const verdictBadgeStyle =
+    match === true
+      ? "border-teal bg-teal/10 text-teal"
+      : match === false
+      ? "border-coral bg-coral/10 text-coral"
+      : "border-ink/15 bg-white text-ink/70";
 
   return (
-    <div className="mb-4 rounded-xl bg-ink/5 p-3 text-sm text-ink/70">
-      You guessed this {GUESS_COPY[guess]}. TRACE found it {verdictText}. Here&apos;s exactly what
-      changed the picture:
+    <div className="mb-5">
+      <div className="relative flex items-center justify-center gap-3 overflow-hidden rounded-2xl border-2 border-ink/10 bg-ink/[0.02] px-4 py-6">
+        {match === true && (
+          <motion.div
+            className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-teal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.7, 0] }}
+            transition={{ delay: 0.85, duration: 0.9 }}
+          />
+        )}
+
+        <motion.div
+          initial={{ x: -36, opacity: 0 }}
+          animate={
+            match === false
+              ? { x: [-36, 0, 0, -3, 3, -3, 0], opacity: [0, 1, 1, 1, 1, 1, 1] }
+              : { x: 0, opacity: 1 }
+          }
+          transition={
+            match === false
+              ? { duration: 1.1, times: [0, 0.4, 0.65, 0.75, 0.85, 0.95, 1], ease: "easeOut" }
+              : { duration: 0.5, ease: "easeOut" }
+          }
+          className="rounded-full border-2 border-ink/15 bg-white px-4 py-2 text-sm font-semibold text-ink"
+        >
+          You: {GUESS_BADGE_TEXT[guess]}
+        </motion.div>
+
+        <motion.div
+          initial={{ scale: 0, opacity: 0, rotate: -90 }}
+          animate={{ scale: 1, opacity: 1, rotate: 0 }}
+          transition={{ delay: 0.55, duration: 0.45, type: "spring", stiffness: 320, damping: 16 }}
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${connectorStyle}`}
+        >
+          {match === true ? (
+            <Check size={16} strokeWidth={3} />
+          ) : match === false ? (
+            <X size={16} strokeWidth={3} />
+          ) : (
+            <Minus size={16} strokeWidth={3} />
+          )}
+        </motion.div>
+
+        <motion.div
+          initial={{ x: 36, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+          className={`rounded-full border-2 px-4 py-2 text-sm font-semibold ${verdictBadgeStyle}`}
+        >
+          TRACE: {LABEL_STYLE[label].text}
+        </motion.div>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9, duration: 0.35 }}
+        className="mt-3 flex items-start gap-2 rounded-xl bg-ink/5 p-3 text-sm text-ink/70"
+      >
+        {match === true && <Sparkles size={16} className="mt-0.5 shrink-0 text-teal" />}
+        <span>
+          {match === null
+            ? `You guessed this ${GUESS_COPY[guess]}. TRACE couldn't reach a confident verdict here, so there's no clean match or miss to score — see why below.`
+            : match
+            ? "Your instinct was right — here's the evidence that confirms it."
+            : `You guessed this ${GUESS_COPY[guess]}. TRACE found it ${verdictText}. Here's exactly what changed the picture:`}
+        </span>
+      </motion.div>
     </div>
   );
 }
 
-function AssessStep({ state, locked, guess }: { state: StageState<Claim>; locked: boolean; guess: Guess | "skipped" | null }) {
+function AssessStep({ state, locked, guess, claimText }: { state: StageState<Claim>; locked: boolean; guess: Guess | "skipped" | null; claimText: string }) {
   if (locked) {
     return <p className="text-sm text-ink/40">Locked until source tracing and evidence gathering finish.</p>;
   }
@@ -180,13 +274,12 @@ function AssessStep({ state, locked, guess }: { state: StageState<Claim>; locked
 
   const { assessment, evidence, verifyYourself } = state.data;
   const style = LABEL_STYLE[assessment.label];
-  const StyleIcon = style.icon;
 
   return (
     <div className="space-y-4">
-      {(guess === "true" || guess === "misleading") && <GuessComparison guess={guess} label={assessment.label} />}
+      {(guess === "true" || guess === "misleading") && <GuessVerdictReveal guess={guess} label={assessment.label} />}
       <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-bold ${style.badge}`}>
-        <StyleIcon size={15} strokeWidth={2.5} />
+        <VerdictGlyph label={assessment.label} size={15} />
         {style.text}
       </div>
       <p className="text-sm leading-relaxed text-ink/70">{assessment.reasoningChain}</p>
@@ -228,7 +321,7 @@ function AssessStep({ state, locked, guess }: { state: StageState<Claim>; locked
       {verifyYourself.length > 0 && (
         <div className="rounded-xl border border-ink/10 bg-white p-4">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-ink/40">Verify this yourself</span>
-          <VerifyChecklist steps={verifyYourself} />
+          <VerifyChecklist steps={verifyYourself} claimText={claimText} />
         </div>
       )}
     </div>
@@ -238,6 +331,7 @@ function AssessStep({ state, locked, guess }: { state: StageState<Claim>; locked
 function GuessGate({ onGuess }: { onGuess: (guess: Guess | "skipped") => void }) {
   return (
     <div className="p-6 text-center sm:p-8">
+      <GuessGateGlyph size={44} className="mx-auto mb-3" />
       <p className="text-base font-semibold text-ink">Before TRACE investigates — what&apos;s your gut read?</p>
       <div className="mt-4 flex flex-wrap justify-center gap-3">
         <button
@@ -305,14 +399,17 @@ export default function InvestigationLive({
         {state.fatalError && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-            className="mb-6 rounded-2xl border-2 border-coral/30 bg-coral/5 p-5"
+            animate={{ opacity: 1, y: [0, 0, -2, 2, -2, 0] }}
+            transition={{ duration: 0.6, times: [0, 0.4, 0.55, 0.7, 0.85, 1] }}
+            className="mb-6 flex items-start gap-3 rounded-2xl border-2 border-coral/30 bg-coral/5 p-5"
           >
-            <p className="flex items-center gap-2 text-sm font-semibold text-coral">
-              <AlertTriangle size={16} /> This investigation hit a problem
-            </p>
-            <p className="mt-1 text-sm text-ink/60">{state.fatalError}</p>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-white bg-coral/10">
+              <ErrorGlyph size={20} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-coral">This investigation hit a problem</p>
+              <p className="mt-1 text-sm text-ink/60">{state.fatalError}</p>
+            </div>
           </motion.div>
         )}
 
@@ -328,10 +425,15 @@ export default function InvestigationLive({
         )}
 
         {state.phase === "extracting" && (
-          <div className="rounded-3xl border-2 border-ink/10 bg-white p-8 text-center">
-            <Loader2 size={20} className="mx-auto mb-3 animate-spin text-teal" />
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="rounded-3xl border-2 border-ink/10 bg-white p-8 text-center"
+          >
+            <ExtractGlyph status="active" size={34} className="mx-auto mb-3" />
             <p className="text-sm text-ink/60">Reading your text and pulling out checkable claims…</p>
-          </div>
+          </motion.div>
         )}
 
         {state.phase === "complete" && state.claims.length === 0 && !state.fatalError && (
@@ -341,7 +443,7 @@ export default function InvestigationLive({
             transition={{ duration: 0.35 }}
             className="rounded-3xl border-2 border-ink/10 bg-white p-8 text-center"
           >
-            <HelpCircle size={22} className="mx-auto mb-3 text-teal" />
+            <EmptyStateGlyph size={30} className="mx-auto mb-3" />
             <p className="text-base font-semibold text-ink">No checkable claim found</p>
             <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink/60">
               TRACE couldn&apos;t find a specific, checkable factual claim in this text — opinions,
@@ -386,16 +488,16 @@ export default function InvestigationLive({
                 ) : (
                   <div className="p-6 sm:p-8">
                     <div className="relative border-l-2 border-ink/10 pl-6 space-y-10">
-                      <StepShell icon={Search} title="Source tracing" locked={false}>
+                      <StepShell icon={TraceGlyph} title="Source tracing" status={stageStatus(claim.traceSource)}>
                         <TraceSourceStep state={claim.traceSource} />
                       </StepShell>
 
-                      <StepShell icon={FileSearch} title="Gather evidence" locked={false}>
+                      <StepShell icon={EvidenceGlyph} title="Gather evidence" status={stageStatus(claim.retrieveEvidence)}>
                         <RetrieveEvidenceStep state={claim.retrieveEvidence} />
                       </StepShell>
 
-                      <StepShell icon={Scale} title="Assess" locked={!bothSettled}>
-                        <AssessStep state={claim.assess} locked={!bothSettled} guess={claim.guess} />
+                      <StepShell icon={AssessGlyph} title="Assess" status={bothSettled ? stageStatus(claim.assess) : "locked"}>
+                        <AssessStep state={claim.assess} locked={!bothSettled} guess={claim.guess} claimText={claim.text} />
                       </StepShell>
                     </div>
                   </div>

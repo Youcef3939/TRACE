@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { buildVerifySearchUrl } from "@/lib/verifySearch";
+import { SearchLinkGlyph } from "./illustrations/StageIcons";
 
-export default function VerifyChecklist({ steps }: { steps: string[] }) {
+export default function VerifyChecklist({ steps, claimText }: { steps: string[]; claimText: string }) {
   const [checked, setChecked] = useState<boolean[]>(() => steps.map(() => false));
 
   const toggle = (i: number) => {
@@ -15,13 +17,14 @@ export default function VerifyChecklist({ steps }: { steps: string[] }) {
     <ul className="space-y-1">
       {steps.map((step, i) => {
         const isChecked = checked[i];
+        const searchUrl = buildVerifySearchUrl(step, claimText);
         return (
-          <li key={step}>
+          <li key={step} className="flex flex-wrap items-start gap-x-1 gap-y-1.5 rounded-lg px-1 py-1.5">
             <button
               type="button"
               onClick={() => toggle(i)}
               aria-pressed={isChecked}
-              className="group flex w-full items-start gap-2.5 rounded-lg px-1 py-1.5 text-left transition-colors hover:bg-ink/5 cursor-pointer"
+              className="group flex flex-1 items-start gap-2.5 text-left cursor-pointer min-w-[60%]"
             >
               <span
                 className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors ${
@@ -47,6 +50,16 @@ export default function VerifyChecklist({ steps }: { steps: string[] }) {
                 {step}
               </span>
             </button>
+            <a
+              href={searchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="ml-6 flex shrink-0 items-center gap-1.5 rounded-full border border-teal/30 bg-teal/5 px-2.5 py-1 text-xs font-semibold text-teal transition-colors hover:border-teal hover:bg-teal/10 cursor-pointer sm:ml-0"
+            >
+              <SearchLinkGlyph size={12} />
+              Try it
+            </a>
           </li>
         );
       })}

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Link2, ImageIcon, ArrowRight, Loader2, UploadCloud } from "lucide-react";
 import { createWorker } from "tesseract.js";
+import { IdleAccentGlyph } from "./illustrations/StageIcons";
 
 type Mode = "text" | "url" | "screenshot";
 
@@ -127,6 +128,7 @@ export default function Hero({
         style={{ background: "radial-gradient(circle, #0F6E56 0%, transparent 70%)" }}
         aria-hidden
       />
+      <IdleAccentGlyph size={150} className="pointer-events-none absolute right-8 top-24 hidden opacity-[0.07] sm:block" />
       <div className="mx-auto max-w-4xl px-5 text-center sm:px-8">
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
