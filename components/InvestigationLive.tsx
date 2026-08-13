@@ -1,9 +1,13 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, CheckCircle2, HelpCircle, Search, FileSearch, Scale, Loader2, Sparkles } from "lucide-react";
 import type { Assessment, Claim, Evidence, SourceTrace } from "@/types/trace";
+import { describeSignal } from "@/lib/manipulationSignals";
+import InfoTooltip from "./InfoTooltip";
+import HighlightedText from "./HighlightedText";
+import VerifyChecklist from "./VerifyChecklist";
 
 export type StageState<T> =
   | { status: "pending" }
@@ -189,11 +193,16 @@ function AssessStep({ state, locked, guess }: { state: StageState<Claim>; locked
 
       {assessment.manipulationSignals.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {assessment.manipulationSignals.map((signal) => (
-            <span key={signal} className="rounded-full bg-ink/5 px-2.5 py-1 text-xs font-medium text-ink/60">
-              {signal}
-            </span>
-          ))}
+          {assessment.manipulationSignals.map((signal) => {
+            const { label, description } = describeSignal(signal);
+            return (
+              <InfoTooltip key={signal} label={label} description={description}>
+                <span className="cursor-help rounded-full bg-ink/5 px-2.5 py-1 text-xs font-medium text-ink/60 underline decoration-dotted decoration-ink/30 underline-offset-2">
+                  {signal}
+                </span>
+              </InfoTooltip>
+            );
+          })}
         </div>
       )}
 
@@ -208,7 +217,9 @@ function AssessStep({ state, locked, guess }: { state: StageState<Claim>; locked
                   {e.sourceName}
                 </a>
               </div>
-              <p className="text-sm italic text-ink/70">&ldquo;{e.excerpt}&rdquo;</p>
+              <p className="text-sm italic text-ink/70">
+                &ldquo;<HighlightedText text={e.excerpt} signals={assessment.manipulationSignals} />&rdquo;
+              </p>
             </div>
           ))}
         </div>
@@ -217,11 +228,7 @@ function AssessStep({ state, locked, guess }: { state: StageState<Claim>; locked
       {verifyYourself.length > 0 && (
         <div className="rounded-xl border border-ink/10 bg-white p-4">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-ink/40">Verify this yourself</span>
-          <ul className="space-y-1.5">
-            {verifyYourself.map((step) => (
-              <li key={step} className="text-sm text-ink/70">• {step}</li>
-            ))}
-          </ul>
+          <VerifyChecklist steps={verifyYourself} />
         </div>
       )}
     </div>
@@ -263,16 +270,18 @@ export default function InvestigationLive({
   state,
   onGuess,
   sessionTally,
+  anchorRef,
 }: {
   state: RunState;
   onGuess: (claimIndex: number, guess: Guess | "skipped") => void;
   sessionTally: { attempted: number; matched: number };
+  anchorRef?: RefObject<HTMLDivElement | null>;
 }) {
   if (state.phase === "idle") return null;
 
   return (
     <section className="bg-cream py-16 sm:py-20 text-ink">
-      <div className="mx-auto max-w-5xl px-5 sm:px-8">
+      <div ref={anchorRef} className="mx-auto max-w-5xl px-5 sm:px-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <span className="flex items-center gap-3">
             <span className="font-mono text-xs uppercase tracking-widest text-ink/40">
@@ -361,7 +370,15 @@ export default function InvestigationLive({
                   <span className="font-mono text-xs uppercase tracking-widest text-ink/40">
                     {"// CLAIM_"}{i + 1}
                   </span>
-                  <p className="mt-2 text-xl font-semibold text-ink sm:text-2xl">&ldquo;{claim.text}&rdquo;</p>
+                  <p className="mt-2 text-xl font-semibold text-ink sm:text-2xl">
+                    &ldquo;
+                    {claim.assess.status === "done" ? (
+                      <HighlightedText text={claim.text} signals={claim.assess.data.assessment.manipulationSignals} />
+                    ) : (
+                      claim.text
+                    )}
+                    &rdquo;
+                  </p>
                 </div>
 
                 {claim.guess === null ? (

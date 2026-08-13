@@ -31,6 +31,7 @@ export default function InvestigateExperience() {
   const startedAtRef = useRef<number | null>(null);
   const runIdRef = useRef(0);
   const countedKeysRef = useRef<Set<string>>(new Set());
+  const investigationAnchorRef = useRef<HTMLDivElement>(null);
 
   // Counts a claim's guess-vs-verdict outcome into the session-wide tally exactly once, the moment
   // both a real guess and a resolved assessment are present for it — regardless of which arrives
@@ -56,6 +57,17 @@ export default function InvestigateExperience() {
       setState((s) => ({ ...s, elapsedMs: Date.now() - startedAtRef.current! }));
     }, 1000);
     return () => clearInterval(interval);
+  }, [state.phase]);
+
+  // Bring the investigation area into view the moment a run starts, so the user isn't left
+  // staring at an unchanged Hero while results render below the fold.
+  useEffect(() => {
+    if (state.phase !== "extracting") return;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    investigationAnchorRef.current?.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
   }, [state.phase]);
 
   const applyEvent = (event: ProgressEvent) => {
@@ -187,7 +199,13 @@ export default function InvestigateExperience() {
   return (
     <>
       <Hero onInvestigate={handleInvestigate} loading={loading} />
-      <InvestigationLive state={state} onGuess={handleGuess} sessionTally={sessionTally} />
+      <InvestigationLive
+        key={runIdRef.current}
+        state={state}
+        onGuess={handleGuess}
+        sessionTally={sessionTally}
+        anchorRef={investigationAnchorRef}
+      />
     </>
   );
 }
