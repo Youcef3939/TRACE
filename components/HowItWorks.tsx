@@ -4,16 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { STEPS } from "@/lib/steps";
-
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.12 } },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
-};
+import AnimatedContent from "@/components/AnimatedContent";
 
 export default function HowItWorks() {
   return (
@@ -35,34 +26,33 @@ export default function HowItWorks() {
           </p>
         </motion.div>
 
-        <motion.div
-          className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.1 }}
-        >
+        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {STEPS.map(({ icon: Icon, label, description }, i) => (
-            <motion.div
+            <AnimatedContent
               key={label}
-              variants={item}
-              className="flex flex-col items-start gap-3 rounded-2xl border-2 border-ink/10 bg-white p-6"
+              distance={24}
+              direction="vertical"
+              duration={0.5}
+              delay={i * 0.1}
+              threshold={0.1}
             >
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-teal bg-cream text-teal">
-                <Icon size={24} strokeWidth={2} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-coral">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="text-lg font-semibold text-ink">{label}</h3>
+              <div className="flex flex-col items-start gap-3 rounded-2xl border-2 border-ink/10 bg-white p-6">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-teal bg-cream text-teal">
+                  <Icon size={24} strokeWidth={2} />
                 </div>
-                <p className="mt-1 text-sm leading-snug text-ink/60">{description}</p>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-coral">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="text-lg font-semibold text-ink">{label}</h3>
+                  </div>
+                  <p className="mt-1 text-sm leading-snug text-ink/60">{description}</p>
+                </div>
               </div>
-            </motion.div>
+            </AnimatedContent>
           ))}
-        </motion.div>
+        </div>
 
         {/* Full process is shown above */}
       </div>

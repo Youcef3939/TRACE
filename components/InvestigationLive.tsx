@@ -3,6 +3,7 @@
 import type { ReactNode, RefObject } from "react";
 import { motion } from "framer-motion";
 import { Loader2, Sparkles, Check, X, Minus } from "lucide-react";
+import ShinyText from "./ShinyText";
 import type { Assessment, Claim, Evidence, SourceTrace } from "@/types/trace";
 import { describeSignal } from "@/lib/manipulationSignals";
 import InfoTooltip from "./InfoTooltip";
@@ -378,9 +379,14 @@ export default function InvestigationLive({
       <div ref={anchorRef} className="mx-auto max-w-5xl px-5 sm:px-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <span className="flex items-center gap-3">
-            <span className="font-mono text-xs uppercase tracking-widest text-ink/40">
-              {state.phase === "complete" ? "Investigation complete" : "Investigating…"}
-            </span>
+            <ShinyText
+              text={state.phase === "complete" ? "Investigation complete" : "Investigating…"}
+              disabled={state.phase === "complete"}
+              speed={3}
+              color="rgba(20, 35, 29, 0.55)"
+              shineColor="#FAF8F2"
+              className="font-mono text-xs uppercase tracking-widest"
+            />
             {sessionTally.attempted > 0 && (
               <span className="rounded-full bg-ink/5 px-2.5 py-1 text-xs font-medium text-ink/50">
                 {sessionTally.matched}/{sessionTally.attempted} guesses matched TRACE
