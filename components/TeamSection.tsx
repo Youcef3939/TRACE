@@ -33,8 +33,9 @@ const TEAM = [
     name: "Youcef Chalbi", 
     image: "/youcef.png",
     roles: [
-      "AI engineer",
-      "3 years journalist @ maktaris news"
+      "Computer engineering student",
+      "3 years journalist @ maktaris news",
+      "Active open source contributor"
     ],
     github: "https://github.com/Youcef3939",
     linkedin: "https://www.linkedin.com/in/youcefchalbi/"
