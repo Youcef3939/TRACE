@@ -52,7 +52,7 @@ export default function LearnContent() {
         title="Spot it before you share it"
         description={
           <>
-            You don&rsquo;t need a tool to catch most manipulation — you need
+            You don&rsquo;t need a tool to catch most manipulation, you need
             to know what to look for. Here&rsquo;s where to start.
           </>
         }
@@ -111,7 +111,7 @@ export default function LearnContent() {
             <p className="mt-4 text-lg leading-relaxed text-ink/70">
               It used to be enough to check whether a photo looked edited or
               a quote sounded plausible. AI-generated text, images, and video
-              have moved that bar — content can now look polished,
+              have moved that bar, content can now look polished,
               well-sourced, and confident while being entirely fabricated.
             </p>
             <p className="mt-4 text-lg leading-relaxed text-ink/70">

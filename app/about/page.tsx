@@ -7,7 +7,7 @@ import Transparency from "@/components/Transparency";
 import TeamSection from "@/components/TeamSection";
 
 export const metadata: Metadata = {
-  title: "About — TRACE",
+  title: "About - TRACE",
   description:
     "TRACE is a two-person project built for the UNESCO Youth Hackathon 2026, focused on explainable media-literacy tooling.",
 };

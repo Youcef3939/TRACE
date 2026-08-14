@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TRACE — Think. Research. Assess. Check. Explain.",
+  title: "TRACE - Think. Research. Assess. Check. Explain.",
   description:
     "TRACE is an AI media-literacy guide that helps you investigate claims instead of just handing you a verdict.",
 };

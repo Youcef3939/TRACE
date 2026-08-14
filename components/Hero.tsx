@@ -230,7 +230,7 @@ export default function Hero({
               <span className="text-xs text-ink/40">
                 {mode === "screenshot"
                   ? "We'll convert your screenshot to text so you can review it first."
-                  : "Press Investigate to start — nothing is submitted until you click."}
+                  : "Press Investigate to start, nothing is submitted until you click."}
               </span>
               <button
                 type="button"

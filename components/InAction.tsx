@@ -19,7 +19,7 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
             See TRACE in action
           </h2>
           <p className="mt-3 text-lg text-ink/65">
-            A real investigation, start to finish — every step stays visible, transparent, and auditable.
+            A real investigation, start to finish, every step stays visible, transparent, and auditable.
           </p>
         </motion.div>
 

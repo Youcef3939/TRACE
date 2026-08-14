@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import LabGame from "@/components/lab/LabGame";
 
 export const metadata: Metadata = {
-  title: "The Lab — TRACE",
+  title: "The Lab - TRACE",
   description: "Practice your Media and Information Literacy skills in The Lab.",
 };
 
