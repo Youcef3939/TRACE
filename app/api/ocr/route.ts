@@ -1,30 +1,49 @@
 import { NextResponse } from "next/server";
-import { createWorker } from "tesseract.js";
+import { generateText } from "ai";
+import { createGroq } from "@ai-sdk/groq";
 
 export const maxDuration = 60;
 
+const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
+
 export async function POST(req: Request) {
   try {
-    const { imageBase64 } = await req.json();
+    const { imageBase64, query } = await req.json();
 
     if (!imageBase64) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
     }
     
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
-    const buffer = Buffer.from(base64Data, "base64");
+    const imageBuffer = Buffer.from(base64Data, "base64");
 
-    const worker = await createWorker('eng');
-    const { data: { text } } = await worker.recognize(buffer);
-    await worker.terminate();
+    const systemPrompt = query 
+      ? "You are TRACE's visual analysis assistant. The user has uploaded an image and is asking a question about it. Answer their question based purely on what you can see in the image."
+      : "Analyze the visual composition, identified objects, and written text simultaneously. Extract any readable text exactly as written. Then, provide a brief description of the scene or context (e.g., 'This is a news headline screenshot from a phone' or 'This is a meme with manipulated text'). Do not invent information not present in the image.";
+
+    const userPrompt = query || "Extract text and analyze the visual scene.";
+
+    const { text } = await generateText({
+      model: groq("qwen/qwen3.6-27b"),
+      system: systemPrompt,
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: userPrompt },
+            { type: "image", image: imageBuffer },
+          ],
+        },
+      ],
+    });
 
     if (!text || !text.trim()) {
-      return NextResponse.json({ text: "No legible text could be extracted from this image." });
+      return NextResponse.json({ text: "No legible text or recognizable visual context could be extracted from this image." });
     }
 
     return NextResponse.json({ text: text.trim() });
   } catch (error) {
-    console.error("[OCR API] Error:", error);
+    console.error("[Vision API] Error:", error);
     return NextResponse.json({ error: "Failed to extract text from image.", details: String(error) }, { status: 500 });
   }
 }

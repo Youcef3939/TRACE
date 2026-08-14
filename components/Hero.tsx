@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { FileText, Link2, ImageIcon, ArrowRight, Loader2, UploadCloud } from "lucide-react";
-import { createWorker } from "tesseract.js";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, Link2, ImageIcon, ArrowRight, Loader2, UploadCloud, Send } from "lucide-react";
 import { IdleAccentGlyph } from "./illustrations/StageIcons";
 
 type Mode = "text" | "url" | "screenshot";
+type ChatMessage = { role: "user" | "ai"; content: string };
 
 const PLACEHOLDERS: Record<Mode, string[]> = {
   text: [
@@ -49,6 +49,11 @@ export default function Hero({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [activeImageBase64, setActiveImageBase64] = useState<string | null>(null);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [chatQuery, setChatQuery] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+
   const placeholders = useMemo(() => PLACEHOLDERS[mode], [mode]);
   const safePlaceholderIndex = placeholderIndex % placeholders.length;
 
@@ -61,14 +66,24 @@ export default function Hero({
   }, [placeholders]);
 
   const handleInvestigate = () => {
-  if (!value.trim() || loading || extracting || mode === "screenshot") return;
-  onInvestigate?.(value, mode);
-};
+    if (!value.trim() || loading || extracting || mode === "screenshot") return;
+    onInvestigate?.(value, mode);
+  };
 
   const handleChip = (text: string) => {
     setMode("text");
     setValue(text);
+    setActiveImageBase64(null);
+    setChatHistory([]);
     textareaRef.current?.focus();
+  };
+
+  const handleModeChange = (newMode: Mode) => {
+    setMode(newMode);
+    if (newMode !== "screenshot" && newMode !== "text") {
+      setActiveImageBase64(null);
+      setChatHistory([]);
+    }
   };
 
   const handleImage = async (file: File) => {
@@ -76,23 +91,58 @@ export default function Hero({
     setExtracting(true);
     setMode("text"); 
     setValue("");
+    setActiveImageBase64(null);
+    setChatHistory([]);
     
     try {
-      const worker = await createWorker('eng');
-      
-      const { data: { text } } = await worker.recognize(file);
-      await worker.terminate();
-      
-      if (!text || !text.trim()) {
-        setValue("[No legible text could be extracted from this image.]");
-      } else {
-        setValue(text.trim());
-      }
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result as string;
+        setActiveImageBase64(base64);
+        
+        const res = await fetch("/api/ocr", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageBase64: base64 })
+        });
+        
+        const data = await res.json();
+        if (data.text) {
+          setValue(data.text);
+        } else {
+          setValue("[Error extracting visual context. Please try again.]");
+        }
+        setExtracting(false);
+      };
+      reader.readAsDataURL(file);
     } catch (err) {
       console.error(err);
-      setValue("[Error extracting text from image. Please try again.]\n\nDetails: " + (err instanceof Error ? err.message : String(err)));
-    } finally {
+      setValue("[Error extracting visual context. Please try again.]\n\nDetails: " + (err instanceof Error ? err.message : String(err)));
       setExtracting(false);
+    }
+  };
+
+  const handleChatSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatQuery.trim() || !activeImageBase64 || chatLoading) return;
+    
+    const query = chatQuery;
+    setChatQuery("");
+    setChatHistory((prev) => [...prev, { role: "user", content: query }]);
+    setChatLoading(true);
+    
+    try {
+      const res = await fetch("/api/ocr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageBase64: activeImageBase64, query })
+      });
+      const data = await res.json();
+      setChatHistory((prev) => [...prev, { role: "ai", content: data.text || "Failed to analyze." }]);
+    } catch (err) {
+      setChatHistory((prev) => [...prev, { role: "ai", content: "Error connecting to vision engine." }]);
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -161,13 +211,13 @@ export default function Hero({
                 role="tab"
                 aria-selected={mode === id}
                 disabled={disabled}
-                onClick={() => !disabled && setMode(id)}
+                onClick={() => !disabled && handleModeChange(id)}
                 className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                   mode === id
                     ? "bg-ink text-cream"
                     : disabled
                     ? "cursor-not-allowed text-ink/35"
-                    : "text-ink/60 hover:bg-ink/5 hover:text-ink"
+                    : "text-ink/60 hover:bg-ink/5 hover:text-ink cursor-pointer"
                 }`}
               >
                 <Icon size={15} />
@@ -187,13 +237,13 @@ export default function Hero({
             onDrop={handleDrop}
           >
             {extracting ? (
-              <div className="flex h-[96px] w-full flex-col items-center justify-center gap-3 text-ink/60">
+              <div className="flex h-[120px] w-full flex-col items-center justify-center gap-3 text-ink/60">
                 <Loader2 size={24} className="animate-spin text-teal" />
-                <span className="text-sm font-medium">Extracting text from screenshot...</span>
+                <span className="text-sm font-medium">Analyzing visual scene and extracting text...</span>
               </div>
             ) : mode === "screenshot" ? (
               <div 
-                className="flex h-[96px] w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ink/20 bg-cream/50 transition-colors hover:border-teal/50 hover:bg-teal/5"
+                className="flex h-[120px] w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ink/20 bg-cream/50 transition-colors hover:border-teal/50 hover:bg-teal/5"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <UploadCloud size={24} className="text-teal" />
@@ -218,7 +268,7 @@ export default function Hero({
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onPaste={handlePaste}
-                rows={mode === "url" ? 2 : 4}
+                rows={mode === "url" ? 2 : activeImageBase64 ? 6 : 4}
                 placeholder={placeholders[safePlaceholderIndex]}
                 className="w-full resize-none bg-transparent text-lg text-ink placeholder:text-ink/35 focus:outline-none"
               />
@@ -227,7 +277,7 @@ export default function Hero({
             <div className="mt-2 flex items-center justify-between gap-3">
               <span className="text-xs text-ink/40">
                 {mode === "screenshot"
-                  ? "We'll convert your screenshot to text so you can review it first."
+                  ? "We'll analyze your screenshot so you can review it first."
                   : "Press Investigate to start, nothing is submitted until you click."}
               </span>
               <button
@@ -250,6 +300,58 @@ export default function Hero({
               </button>
             </div>
           </div>
+
+          <AnimatePresence>
+            {activeImageBase64 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                animate={{ opacity: 1, height: "auto", marginTop: 16 }}
+                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="rounded-2xl border-2 border-ink/10 bg-white p-4 shadow-sm flex flex-col gap-3">
+                  {chatHistory.length > 0 && (
+                    <div className="flex max-h-48 flex-col gap-3 overflow-y-auto pr-2 pb-2">
+                      {chatHistory.map((msg, i) => (
+                        <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                          <div className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
+                            msg.role === "user" ? "bg-teal text-cream" : "bg-cream text-ink/80"
+                          }`}>
+                            {msg.content}
+                          </div>
+                        </div>
+                      ))}
+                      {chatLoading && (
+                        <div className="flex justify-start">
+                          <div className="max-w-[85%] rounded-2xl bg-cream px-4 py-3 text-ink/80">
+                            <Loader2 size={14} className="animate-spin text-teal" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  <form onSubmit={handleChatSubmit} className="relative flex items-center">
+                    <input
+                      type="text"
+                      value={chatQuery}
+                      onChange={(e) => setChatQuery(e.target.value)}
+                      placeholder="Ask TRACE a question about this image..."
+                      disabled={chatLoading}
+                      className="w-full rounded-xl border-2 border-ink/10 bg-cream/30 px-4 py-3 pr-12 text-sm text-ink focus:border-teal focus:outline-none disabled:opacity-50"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!chatQuery.trim() || chatLoading}
+                      className="absolute right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-teal text-cream transition-colors hover:bg-[#0c5c48] disabled:cursor-not-allowed disabled:bg-ink/20 disabled:text-ink/40"
+                    >
+                      <Send size={14} />
+                    </button>
+                  </form>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="text-sm text-ink/45">Try:</span>
