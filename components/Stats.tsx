@@ -31,7 +31,7 @@ export default function Stats() {
         viewport={{ once: true, amount: 0.4 }}
       >
         {STATS.map((stat) => (
-          <motion.div key={stat.label} variants={item} className="text-center lg:text-left">
+          <motion.div key={stat.label} variants={item} className="flex flex-col items-center justify-center text-center">
             <div className="text-5xl font-bold tracking-tight text-teal sm:text-6xl">
               <CountUp to={stat.value} suffix={stat.suffix} duration={1.4} />
             </div>
