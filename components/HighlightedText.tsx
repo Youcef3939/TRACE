@@ -21,7 +21,7 @@ export default function HighlightedText({ text, signals }: { text: string; signa
       let m: RegExpExecArray | null;
       while ((m = re.exec(text))) {
         matches.push({ start: m.index, end: m.index + m[0].length, category });
-        if (m[0].length === 0) re.lastIndex++; // avoid infinite loop on zero-width matches
+        if (m[0].length === 0) re.lastIndex++; 
       }
     }
   }

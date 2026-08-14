@@ -2,12 +2,6 @@
 
 import { motion } from "framer-motion";
 
-/**
- * One consistent line-art system for every /investigate visual: teal (#0F6E56) strokes, coral
- * (#D85A30) accents, flat geometry, round joins/caps — the same vocabulary as the TRACE logo
- * (magnifying glass + thread-and-nodes). All motion goes through framer-motion so it automatically
- * respects prefers-reduced-motion via the MotionConfig set up in app/layout.tsx.
- */
 
 const TEAL = "#0F6E56";
 const CORAL = "#D85A30";
@@ -23,7 +17,6 @@ interface StageGlyphProps extends GlyphProps {
   status: StageStatus;
 }
 
-/** Small checkmark badge that pops onto the corner of a stage icon the moment it settles into "done". */
 export function DoneMark({ size = 13 }: { size?: number }) {
   return (
     <motion.svg

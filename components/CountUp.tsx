@@ -3,11 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useInView, animate } from "framer-motion";
 
-/**
- * Counts up from `from` to `to` once it scrolls into view. Ported from React Bits' CountUp
- * (which depends on the `motion` package) onto framer-motion's imperative `animate()` so the
- * project doesn't need a second, overlapping animation library.
- */
+
 export default function CountUp({
   to,
   from = 0,

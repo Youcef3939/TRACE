@@ -14,7 +14,7 @@ export interface LabClaim {
 }
 
 export const LAB_CLAIMS: LabClaim[] = [
-  // --- LEVEL 1: SOURCE CREDIBILITY ---
+
   {
     id: "l1-1",
     level: 1,
@@ -78,7 +78,6 @@ export const LAB_CLAIMS: LabClaim[] = [
     explanation: "This was a real hoax from 2018. The account used the ABC News logo but was a parody/impersonation account. A quick check of the actual @ABC account or their website showed no such report."
   },
 
-  // --- LEVEL 2: CONTEXT ---
   {
     id: "l2-1",
     level: 2,
@@ -142,7 +141,6 @@ export const LAB_CLAIMS: LabClaim[] = [
     explanation: "This is a factual reporting of macroeconomic data in its proper context, reflecting official Bureau of Labor Statistics reports without hyperbole."
   },
 
-  // --- LEVEL 3: EVIDENCE ---
   {
     id: "l3-1",
     level: 3,
@@ -206,7 +204,6 @@ export const LAB_CLAIMS: LabClaim[] = [
     explanation: "While affidavits represent someone's belief, numerous court cases and state audits found no evidence of 10,000 dead voters. Claims require verifiable proof, not just allegations."
   },
 
-  // --- LEVEL 4: VERIFICATION ---
   {
     id: "l4-1",
     level: 4,
@@ -271,7 +268,6 @@ export const LAB_CLAIMS: LabClaim[] = [
     explanation: "A bizarrely popular TikTok conspiracy. Historical records, thousands of witnesses, her extensive correspondence, and documented methods of tactile sign language prove her existence and accomplishments beyond a doubt."
   },
 
-  // --- LEVEL 5: ADVANCED / AI ---
   {
     id: "l5-1",
     level: 5,

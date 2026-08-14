@@ -7,14 +7,6 @@ export interface RawEvidenceItem {
   content: string;
 }
 
-/**
- * Retrieves candidate evidence for a claim. This stage is deliberately dumb: it only
- * fetches and shapes search results, it does NOT decide whether a source supports,
- * contradicts, or is merely discussing the claim. Labeling stance requires reading
- * and reasoning about the content, which belongs in assess.ts — conflating "this
- * source mentions the claim" with "this source supports the claim" here would bake
- * in the same misattribution risk traceSource.ts had to be fixed for.
- */
 export async function retrieveEvidence(claim: ExtractedClaim): Promise<RawEvidenceItem[]> {
   let searchResults;
   try {

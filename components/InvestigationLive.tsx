@@ -33,7 +33,7 @@ export interface ClaimRunState {
   text: string;
   originalContext: string;
   traceSource: StageState<SourceTrace>;
-  retrieveEvidence: StageState<number>; // just the count of sources found
+  retrieveEvidence: StageState<number>; 
   assess: StageState<Claim>;
   guess: Guess | "skipped" | null;
 }
@@ -67,7 +67,6 @@ function formatElapsed(ms: number) {
   return `${s}s`;
 }
 
-/** Maps a pipeline stage's raw state to the shared visual vocabulary the stage glyphs render against. */
 function stageStatus<T>(state: StageState<T>): StageStatus {
   if (state.status === "error") return "error";
   if (state.status === "done") return "done";
@@ -146,11 +145,6 @@ function RetrieveEvidenceStep({ state }: { state: StageState<number> }) {
   );
 }
 
-/**
- * Maps a verdict label to whether it agrees with a "true" or "misleading" gut guess.
- * Returns null for verdicts that are inherently ambiguous relative to a binary guess
- * (unverifiable / insufficient_evidence) — those shouldn't be scored as a match or a miss.
- */
 export function guessMatchesVerdict(guess: Guess, label: Assessment["label"]): boolean | null {
   if (label === "well_supported") return guess === "true";
   if (label === "misleading" || label === "questionable") return guess === "misleading";
@@ -167,11 +161,6 @@ const GUESS_BADGE_TEXT: Record<Guess, string> = {
   misleading: "Looked misleading",
 };
 
-/**
- * The payoff moment of the guess-before-reveal mechanic: the user's gut read and TRACE's verdict
- * slide in from opposite sides and collide in the middle, where a connector glyph resolves the
- * comparison (check for a match, x for a miss, dash when the verdict is too ambiguous to score).
- */
 function GuessVerdictReveal({ guess, label }: { guess: Guess; label: Assessment["label"] }) {
   const match = guessMatchesVerdict(guess, label);
   const verdictText = LABEL_STYLE[label].text.toLowerCase();

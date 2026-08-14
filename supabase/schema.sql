@@ -1,31 +1,27 @@
--- TRACE Supabase Schema
--- Create the tables needed for the TRACE application
-
--- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Investigations Table
+
 CREATE TABLE investigations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID, -- Optional for anonymous usage
+  user_id UUID, 
   input_type TEXT NOT NULL CHECK (input_type IN ('text', 'url', 'image', 'social_post')),
   input_raw TEXT NOT NULL,
   input_language TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Claims Table
+
 CREATE TABLE claims (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   investigation_id UUID NOT NULL REFERENCES investigations(id) ON DELETE CASCADE,
   text TEXT NOT NULL,
   original_context TEXT NOT NULL,
   verify_yourself JSONB NOT NULL DEFAULT '[]'::JSONB,
-  -- Assessment Label & Reasoning
+
   assessment_label TEXT NOT NULL CHECK (assessment_label IN ('well_supported', 'questionable', 'misleading', 'unverifiable', 'insufficient_evidence')),
   assessment_reasoning_chain TEXT NOT NULL,
   assessment_manipulation_signals JSONB NOT NULL DEFAULT '[]'::JSONB,
-  -- Source Trace
+
   source_origin_url TEXT,
   source_origin_author TEXT,
   source_origin_publish_date TEXT,
@@ -34,7 +30,6 @@ CREATE TABLE claims (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Evidence Table
 CREATE TABLE evidence (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   claim_id UUID NOT NULL REFERENCES claims(id) ON DELETE CASCADE,
@@ -48,7 +43,6 @@ CREATE TABLE evidence (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Ancestry Hops Table (for the Ancestry Map)
 CREATE TABLE ancestry_hops (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   claim_id UUID NOT NULL REFERENCES claims(id) ON DELETE CASCADE,
@@ -61,7 +55,6 @@ CREATE TABLE ancestry_hops (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Add simple RLS policies (allow all for prototype)
 ALTER TABLE investigations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE claims ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evidence ENABLE ROW LEVEL SECURITY;

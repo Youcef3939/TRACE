@@ -47,7 +47,6 @@ export async function POST(req: Request) {
 
     let result;
     try {
-      // Remove possible markdown formatting if the model disobeys
       const cleaned = text.replace(/^```json\\n?/, '').replace(/\\n?```$/, '').trim();
       result = JSON.parse(cleaned);
     } catch (parseError) {

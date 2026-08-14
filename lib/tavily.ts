@@ -1,12 +1,5 @@
 const MIN_EXTRACTED_CONTENT_CHARS = 200;
 
-/**
- * Tavily's raw_content keeps every markdown link on the page, including nav menus, tables of
- * contents, and (on Wikipedia especially) hundreds of interlanguage-link bullets before the
- * article text even starts. Left in, these can eat the entire truncation budget downstream
- * without a single real sentence surviving. Strip lines that are nothing but a link bullet —
- * real prose essentially never takes that exact shape, so this is safe across most sites.
- */
 function stripLinkListBoilerplate(text: string): string {
   return text
     .split('\n')
@@ -14,11 +7,6 @@ function stripLinkListBoilerplate(text: string): string {
     .join('\n');
 }
 
-/**
- * Fetches and returns the cleaned main text of a web page via Tavily's Extract API.
- * Throws a descriptive Error for every failure mode the caller needs to distinguish:
- * malformed URL, unreachable/blocked page, or a page with no real readable content.
- */
 export async function extractUrlContent(url: string): Promise<string> {
   const apiKey = process.env.TAVILY_API_KEY;
 
