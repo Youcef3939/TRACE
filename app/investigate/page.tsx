@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import InvestigateExperience from "@/components/InvestigateExperience";
 
 export const metadata: Metadata = {
-  title: "Investigate — TRACE",
+  title: "Investigate - TRACE",
   description:
     "Paste a claim or a link and watch TRACE walk through the evidence, step by step.",
 };

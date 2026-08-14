@@ -114,7 +114,7 @@ function TraceSourceStep({ state }: { state: StageState<SourceTrace> }) {
     return <p className="text-sm text-ink/50">Waiting to start…</p>;
   }
   if (state.status === "error") {
-    return <p className="text-sm text-coral/80">This step had an issue — continuing without it.</p>;
+    return <p className="text-sm text-coral/80">This step had an issue, continuing without it.</p>;
   }
   const { confidence, originUrl, originAuthor, publicationTrackRecord } = state.data;
   if (!originUrl) {
@@ -127,7 +127,7 @@ function TraceSourceStep({ state }: { state: StageState<SourceTrace> }) {
   return (
     <p className="text-sm leading-relaxed text-ink/70">
       Likely origin: <a href={originUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-teal hover:underline">{originAuthor || originUrl}</a>
-      {publicationTrackRecord ? ` — ${publicationTrackRecord}` : ""} (confidence: {confidence})
+      {publicationTrackRecord ? `, ${publicationTrackRecord}` : ""} (confidence: {confidence})
     </p>
   );
 }
@@ -137,7 +137,7 @@ function RetrieveEvidenceStep({ state }: { state: StageState<number> }) {
     return <p className="text-sm text-ink/50">Waiting to start…</p>;
   }
   if (state.status === "error") {
-    return <p className="text-sm text-coral/80">This step had an issue — continuing without it.</p>;
+    return <p className="text-sm text-coral/80">This step had an issue, continuing without it.</p>;
   }
   return (
     <p className="text-sm leading-relaxed text-ink/70">
@@ -248,9 +248,9 @@ function GuessVerdictReveal({ guess, label }: { guess: Guess; label: Assessment[
         {match === true && <Sparkles size={16} className="mt-0.5 shrink-0 text-teal" />}
         <span>
           {match === null
-            ? `You guessed this ${GUESS_COPY[guess]}. TRACE couldn't reach a confident verdict here, so there's no clean match or miss to score — see why below.`
+            ? `You guessed this ${GUESS_COPY[guess]}. TRACE couldn't reach a confident verdict here, so there's no clean match or miss to score, see why below.`
             : match
-            ? "Your instinct was right — here's the evidence that confirms it."
+            ? "Your instinct was right, here's the evidence that confirms it."
             : `You guessed this ${GUESS_COPY[guess]}. TRACE found it ${verdictText}. Here's exactly what changed the picture:`}
         </span>
       </motion.div>
@@ -270,7 +270,7 @@ function AssessStep({ state, locked, guess, claimText }: { state: StageState<Cla
     );
   }
   if (state.status === "error") {
-    return <p className="text-sm text-coral/80">Assessment failed for this claim — {state.error}</p>;
+    return <p className="text-sm text-coral/80">Assessment failed for this claim: {state.error}</p>;
   }
 
   const { assessment, evidence, verifyYourself } = state.data;
@@ -333,7 +333,7 @@ function GuessGate({ onGuess }: { onGuess: (guess: Guess | "skipped") => void })
   return (
     <div className="p-6 text-center sm:p-8">
       <GuessGateGlyph size={44} className="mx-auto mb-3" />
-      <p className="text-base font-semibold text-ink">Before TRACE investigates — what&apos;s your gut read?</p>
+      <p className="text-base font-semibold text-ink">Before TRACE investigates, what&apos;s your gut read?</p>
       <div className="mt-4 flex flex-wrap justify-center gap-3">
         <button
           type="button"
@@ -355,7 +355,7 @@ function GuessGate({ onGuess }: { onGuess: (guess: Guess | "skipped") => void })
         onClick={() => onGuess("skipped")}
         className="mt-4 text-xs font-medium text-ink/40 underline decoration-ink/20 underline-offset-2 hover:text-ink/60 cursor-pointer"
       >
-        Skip — just show me
+        Skip, just show me
       </button>
     </div>
   );
@@ -397,7 +397,7 @@ export default function InvestigationLive({
             <span className="flex items-center gap-2 text-xs text-ink/40">
               <Loader2 size={12} className="animate-spin" />
               {formatElapsed(state.elapsedMs)} elapsed
-              {state.elapsedMs > 15000 ? " — still working, real sources take time to read" : ""}
+              {state.elapsedMs > 15000 ? ", still working, real sources take time to read" : ""}
             </span>
           )}
         </div>
@@ -452,12 +452,12 @@ export default function InvestigationLive({
             <EmptyStateGlyph size={30} className="mx-auto mb-3" />
             <p className="text-base font-semibold text-ink">No checkable claim found</p>
             <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink/60">
-              TRACE couldn&apos;t find a specific, checkable factual claim in this text — opinions,
+              TRACE couldn&apos;t find a specific, checkable factual claim in this text, opinions,
               questions, and speculation aren&apos;t things evidence can confirm or refute. TRACE looks
               for statements that assert something about the world.
             </p>
             <p className="mx-auto mt-3 max-w-md text-sm text-ink/50">
-              Try pasting a specific statement instead — e.g. &ldquo;Coffee cures cancer&rdquo; rather
+              Try pasting a specific statement instead, e.g. &ldquo;Coffee cures cancer&rdquo; rather
               than a question or opinion.
             </p>
           </motion.div>

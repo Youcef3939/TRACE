@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import LearnContent from "@/components/LearnContent";
 
 export const metadata: Metadata = {
-  title: "Learn — Media literacy basics",
+  title: "Learn - Media literacy basics",
   description:
     "Learn how to spot manipulation in what you read online, and why verification has gotten harder in the age of AI-generated content.",
 };

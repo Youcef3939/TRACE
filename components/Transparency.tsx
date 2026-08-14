@@ -60,7 +60,7 @@ export default function Transparency() {
             </div>
             <p className="mt-6 text-sm leading-relaxed text-ink/55">
               A single number with no visible path to it. You either trust
-              the score or you don&rsquo;t — there&rsquo;s nothing to
+              the score or you don&rsquo;t, there&rsquo;s nothing to
               check, question, or learn from.
             </p>
           </motion.div>

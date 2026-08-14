@@ -19,7 +19,7 @@ export default function HowItWorksPage() {
           title="How TRACE works"
           description={
             <>
-              Six steps, start to finish. No hidden scoring — you&rsquo;ll
+              Six steps, start to finish. No hidden scoring, you&rsquo;ll
               see exactly why TRACE reaches the conclusion it does, at every
               stage along the way.
             </>
