@@ -3,6 +3,7 @@ import HomeHero from "@/components/HomeHero";
 import ScrollRevealParagraph from "@/components/ScrollRevealParagraph";
 import HowItWorks from "@/components/HowItWorks";
 import Stats from "@/components/Stats";
+import FAQ from "@/components/FAQ";
 import InAction from "@/components/InAction";
 import Footer from "@/components/Footer";
 
@@ -16,6 +17,7 @@ export default function Home() {
         <HowItWorks />
         <InAction showCta />
         <Stats />
+        <FAQ />
       </main>
       <Footer />
     </div>
