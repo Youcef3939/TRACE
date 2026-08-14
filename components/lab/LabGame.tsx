@@ -7,7 +7,8 @@ import LevelProgress from "./LevelProgress";
 import ClaimCard from "./ClaimCard";
 import InvestigationForm from "./InvestigationForm";
 import MasteryScreen from "./MasteryScreen";
-import { X, Check } from "lucide-react";
+import { X, Check, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 type Feedback = {
   success: boolean;
@@ -16,6 +17,7 @@ type Feedback = {
 };
 
 export default function LabGame() {
+  const [hasStarted, setHasStarted] = useState(false);
   const [level, setLevel] = useState(1);
   const [queue, setQueue] = useState<LabClaim[]>([]);
   const [currentClaimIndex, setCurrentClaimIndex] = useState(0);
@@ -86,12 +88,42 @@ export default function LabGame() {
     return <MasteryScreen />;
   }
 
+  if (!hasStarted) {
+    return (
+      <div className="flex-1 w-full max-w-4xl mx-auto px-5 py-12 sm:px-8 flex items-center justify-center min-h-[60vh]">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-2xl text-center"
+        >
+          <h1 className="text-4xl font-bold text-ink sm:text-5xl mb-6">Welcome to The Lab</h1>
+          <p className="text-xl text-ink/80 leading-relaxed mb-10">
+            We don't want you to trust our AI blindly. True media literacy means validating information for yourself. Welcome to The Lab: your training ground to dismantle deception!
+          </p>
+          <button
+            onClick={() => setHasStarted(true)}
+            className="group inline-flex items-center gap-3 rounded-full bg-teal px-8 py-4 text-base font-bold text-cream transition-all cursor-pointer hover:bg-[#0c5c48] hover:scale-[1.02] active:scale-[0.98] shadow-sm"
+          >
+            Enter The Lab
+            <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
   if (!currentClaim) {
     return <div className="flex-1 flex items-center justify-center">Loading Lab...</div>;
   }
 
   return (
-    <div className="flex-1 w-full max-w-4xl mx-auto px-5 py-12 sm:px-8">
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="flex-1 w-full max-w-4xl mx-auto px-5 py-12 sm:px-8"
+    >
       <LevelProgress level={level} skill={currentClaim.skill} />
       
       {!feedback ? (
@@ -123,6 +155,6 @@ export default function LabGame() {
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
