@@ -23,7 +23,6 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
           </p>
         </motion.div>
 
-        {/* Dashboard Canvas */}
         <motion.div
           className="relative overflow-hidden rounded-3xl border-2 border-ink/10 bg-white shadow-xl"
           initial={{ opacity: 0, y: 20 }}
@@ -31,7 +30,6 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          {/* Dashboard Header */}
           <div className="flex flex-col gap-4 border-b border-ink/10 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8 bg-white">
             <div>
               <span className="font-mono text-xs uppercase tracking-widest text-ink/40">
@@ -49,11 +47,9 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
             </div>
           </div>
 
-          {/* Dashboard Pipeline / Timeline */}
           <div className="p-6 sm:p-8">
             <div className="relative border-l-2 border-ink/10 pl-6 space-y-10 sm:space-y-12">
               
-              {/* Step 1: Claim Extraction & Tracing */}
               <div className="relative">
                 <div className="absolute -left-[35px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-teal text-white">
                   <Search size={14} strokeWidth={3} />
@@ -66,7 +62,6 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
                 </p>
               </div>
 
-              {/* Step 2: Sourcing Sherlock (Split Card) */}
               <div className="relative">
                 <div className="absolute -left-[35px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-teal text-white">
                   <FileSearch size={14} strokeWidth={3} />
@@ -76,14 +71,12 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
                 </div>
                 
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {/* Left: Viral Post */}
                   <div className="rounded-xl border border-ink/10 bg-cream/50 p-5">
                     <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-ink/50">Viral Social Post</span>
                     <p className="text-sm italic text-ink/80">
                       "A new breakthrough! Big Pharma is hiding this, but drinking 3 cups of coffee daily actually cures stage 4 cancer within weeks! ☕🧬"
                     </p>
                   </div>
-                  {/* Right: Primary Source Fact */}
                   <div className="rounded-xl border border-ink/10 bg-cream/50 p-5 flex flex-col justify-between">
                     <div>
                       <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-teal">Primary Source (Study)</span>
@@ -103,7 +96,6 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
                 </div>
               </div>
 
-              {/* Step 3: Assessment */}
               <div className="relative">
                 <div className="absolute -left-[35px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-teal text-white">
                   <Scale size={14} strokeWidth={3} />

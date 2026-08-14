@@ -12,9 +12,6 @@ export default function InfoTooltip({
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  // Devices with a real mouse get hover show/hide; touch devices (no hover) get tap-to-toggle
-  // instead — read once at mount so the two mechanisms never fight over the same interaction
-  // (otherwise a mouse hover-open immediately followed by its own click would re-toggle it shut).
   const [supportsHover] = useState(
     () => typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches
   );

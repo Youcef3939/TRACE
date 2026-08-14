@@ -70,14 +70,12 @@ function toTitleCase(s: string): string {
   return s.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-/** Looks up the plain-language label + description for a raw signal string from assess.ts. */
 export function describeSignal(signal: string): { label: string; description: string } {
   const found = SIGNAL_CATEGORIES.find((c) => c.match(signal));
   if (found) return { label: found.label, description: found.description };
   return { label: toTitleCase(signal), description: DEFAULT_DESCRIPTION };
 }
 
-/** Resolves a claim's raw manipulationSignals to the (deduped) known categories that have inline text patterns. */
 export function categoriesForSignals(signals: string[]): SignalCategory[] {
   const seen = new Set<string>();
   const found: SignalCategory[] = [];

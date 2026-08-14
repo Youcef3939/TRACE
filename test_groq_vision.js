@@ -6,7 +6,6 @@ const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
 
 async function test() {
   try {
-    // 1x1 transparent png
     const base64Data = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
     
     const { text } = await generateText({

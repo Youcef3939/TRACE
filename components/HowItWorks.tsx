@@ -54,7 +54,6 @@ export default function HowItWorks() {
           ))}
         </div>
 
-        {/* Full process is shown above */}
       </div>
     </section>
   );

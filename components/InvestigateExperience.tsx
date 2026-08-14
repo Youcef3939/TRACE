@@ -33,9 +33,6 @@ export default function InvestigateExperience() {
   const countedKeysRef = useRef<Set<string>>(new Set());
   const investigationAnchorRef = useRef<HTMLDivElement>(null);
 
-  // Counts a claim's guess-vs-verdict outcome into the session-wide tally exactly once, the moment
-  // both a real guess and a resolved assessment are present for it — regardless of which arrives
-  // second (a fast guesser may click before assess resolves; a slow guesser sees it already done).
   const maybeCountGuess = (claims: ClaimRunState[], claimIndex: number) => {
     const claim = claims[claimIndex];
     if (!claim || (claim.guess !== "true" && claim.guess !== "misleading")) return;
@@ -46,7 +43,7 @@ export default function InvestigateExperience() {
     countedKeysRef.current.add(key);
 
     const result = guessMatchesVerdict(claim.guess, claim.assess.data.assessment.label);
-    if (result === null) return; // ambiguous verdict — not scored as a match or a miss
+    if (result === null) return; 
     setSessionTally((t) => ({ attempted: t.attempted + 1, matched: t.matched + (result ? 1 : 0) }));
   };
 
@@ -59,8 +56,6 @@ export default function InvestigateExperience() {
     return () => clearInterval(interval);
   }, [state.phase]);
 
-  // Bring the investigation area into view the moment a run starts, so the user isn't left
-  // staring at an unchanged Hero while results render below the fold.
   useEffect(() => {
     if (state.phase !== "extracting") return;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

@@ -26,11 +26,9 @@ export default function LabGame() {
   
   const currentClaim = queue[currentClaimIndex];
 
-  // Initialize level queue
   useEffect(() => {
     if (level > 5) return;
     const levelClaims = LAB_CLAIMS.filter((c) => c.level === level);
-    // Shuffle the claims for this level
     const shuffled = [...levelClaims].sort(() => Math.random() - 0.5);
     setQueue(shuffled);
     setCurrentClaimIndex(0);
@@ -60,7 +58,7 @@ export default function LabGame() {
           particleCount: 100,
           spread: 70,
           origin: { y: 0.6 },
-          colors: ['#0F6E56', '#D65A31', '#F4F1DE'] // teal, coral, cream
+          colors: ['#0F6E56', '#D65A31', '#F4F1DE'] 
         });
       }
     } catch (err) {
@@ -77,7 +75,6 @@ export default function LabGame() {
     if (feedback.success) {
       setLevel((l) => l + 1);
     } else {
-      // If failed, just move to next claim in queue
       setCurrentClaimIndex((i) => i + 1);
     }
     

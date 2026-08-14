@@ -74,14 +74,12 @@ export default function Hero({
   const handleImage = async (file: File) => {
     if (!file.type.startsWith("image/")) return;
     setExtracting(true);
-    setMode("text"); // switch to text mode to show the extracted result later
+    setMode("text"); 
     setValue("");
     
     try {
-      // Create a local worker (downloads necessary webassembly & language data on first run)
       const worker = await createWorker('eng');
       
-      // Tesseract handles File objects directly in the browser
       const { data: { text } } = await worker.recognize(file);
       await worker.terminate();
       

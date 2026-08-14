@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createWorker } from "tesseract.js";
 
-// Increase max duration just in case tesseract initialization takes long on the first run
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
@@ -12,7 +11,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
     }
     
-    // Create buffer from base64 string
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     const buffer = Buffer.from(base64Data, "base64");
 

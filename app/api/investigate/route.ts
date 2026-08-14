@@ -1,7 +1,7 @@
 import { runInvestigation } from '@/lib/pipeline/runInvestigation';
 import { extractUrlContent } from '@/lib/tavily';
 
-const MAX_URL_CONTENT_CHARS = 12000; // ~2500-3000 words — enough to find claims, not the whole page
+const MAX_URL_CONTENT_CHARS = 12000;
 
 export async function POST(req: Request) {
   const { input, language = 'en', mode = 'text' } = await req.json();

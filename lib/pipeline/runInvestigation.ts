@@ -20,12 +20,6 @@ export type ProgressEvent =
 
 type Settled<V> = { ok: true; value: V } | { ok: false; error: string };
 
-/**
- * Races the traceSource and retrieveEvidence promises for one claim, yielding each result the moment
- * it settles (true concurrent completion order). Each promise is caught individually so one rejecting
- * never aborts the other or throws out of the race loop — callers get a tagged { ok: false } result to
- * turn into a per-stage error event instead of killing the whole generator.
- */
 async function* raceTraceAndEvidence(
   tracePromise: Promise<SourceTrace>,
   evidencePromise: Promise<RawEvidenceItem[]>

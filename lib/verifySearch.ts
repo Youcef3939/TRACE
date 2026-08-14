@@ -3,7 +3,6 @@ interface SearchPattern {
   buildQuery: (claimText: string) => string;
 }
 
-// Ordered by specificity — the first pattern whose keywords appear in the verify-step text wins.
 const PATTERNS: SearchPattern[] = [
   {
     test: /government|official (record|website|source|statement|data)|\.gov\b/i,
@@ -31,7 +30,6 @@ const PATTERNS: SearchPattern[] = [
   },
 ];
 
-/** Builds a targeted Google search URL for a "verify this yourself" step, using the item's own wording to pick a relevant site: filter. */
 export function buildVerifySearchUrl(item: string, claimText: string): string {
   const pattern = PATTERNS.find((p) => p.test.test(item));
   const query = pattern ? pattern.buildQuery(claimText) : claimText;
