@@ -14,10 +14,10 @@ export default function MasteryScreen() {
       <div className="text-6xl mb-6">🕵️</div>
       <h1 className="text-4xl font-bold text-ink sm:text-5xl mb-6">MASTERY UNLOCKED!</h1>
       <p className="text-xl font-medium text-ink/80 mb-4 leading-relaxed">
-        The ultimate weapon against misinformation isn't a smarter algorithm; it's an unshakeable mind.
+        The ultimate weapon against misinformation isn&apos;t a smarter algorithm; it&apos;s an unshakeable mind.
       </p>
       <p className="text-lg text-ink/60 mb-12">
-        You're ready now. Go spot those fake news!
+        You&apos;re ready now. Go spot those fake news!
       </p>
       <Link
         href="/investigate"

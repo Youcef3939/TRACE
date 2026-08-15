@@ -35,13 +35,26 @@ export async function POST(req: Request) {
           ],
         },
       ],
+      providerOptions: {
+        groq: {
+          reasoningFormat: "hidden",
+          reasoningEffort: "none",
+        },
+      },
     });
 
-    if (!text || !text.trim()) {
+    // Defense in depth: strip any <think> block that slips through, including
+    // one truncated mid-thought (no closing tag) if generation got cut off.
+    const cleanedText = text
+      .replace(/<think>[\s\S]*?<\/think>/gi, "")
+      .replace(/<think>[\s\S]*$/gi, "")
+      .trim();
+
+    if (!cleanedText) {
       return NextResponse.json({ text: "No legible text or recognizable visual context could be extracted from this image." });
     }
 
-    return NextResponse.json({ text: text.trim() });
+    return NextResponse.json({ text: cleanedText });
   } catch (error) {
     console.error("[Vision API] Error:", error);
     return NextResponse.json({ error: "Failed to extract text from image.", details: String(error) }, { status: 500 });

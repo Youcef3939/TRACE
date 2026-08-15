@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import confetti from "canvas-confetti";
 import { LAB_CLAIMS, type LabClaim } from "@/lib/lab/claims";
 import LevelProgress from "./LevelProgress";
@@ -16,23 +16,34 @@ type Feedback = {
   skillPracticed: string;
 };
 
+// Deterministic per-seed shuffle: keeps queue derivation pure so it can live
+// in render (useMemo) instead of an effect-driven setState.
+function seededShuffle<T>(items: T[], seed: number): T[] {
+  let state = seed;
+  const nextRandom = () => {
+    state = (state * 9301 + 49297) % 233280;
+    return state / 233280;
+  };
+  return items
+    .map((item) => ({ item, sortKey: nextRandom() }))
+    .sort((a, b) => a.sortKey - b.sortKey)
+    .map(({ item }) => item);
+}
+
 export default function LabGame() {
   const [hasStarted, setHasStarted] = useState(false);
   const [level, setLevel] = useState(1);
-  const [queue, setQueue] = useState<LabClaim[]>([]);
   const [currentClaimIndex, setCurrentClaimIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  
-  const currentClaim = queue[currentClaimIndex];
 
-  useEffect(() => {
-    if (level > 5) return;
+  const queue = useMemo<LabClaim[]>(() => {
+    if (level > 5) return [];
     const levelClaims = LAB_CLAIMS.filter((c) => c.level === level);
-    const shuffled = [...levelClaims].sort(() => Math.random() - 0.5);
-    setQueue(shuffled);
-    setCurrentClaimIndex(0);
+    return seededShuffle(levelClaims, level);
   }, [level]);
+
+  const currentClaim = queue[currentClaimIndex];
 
   const handleSubmit = async (source: string, v: string) => {
     if (!currentClaim) return;
@@ -74,6 +85,7 @@ export default function LabGame() {
     
     if (feedback.success) {
       setLevel((l) => l + 1);
+      setCurrentClaimIndex(0);
     } else {
       setCurrentClaimIndex((i) => i + 1);
     }
@@ -96,7 +108,7 @@ export default function LabGame() {
         >
           <h1 className="text-4xl font-bold text-ink sm:text-5xl mb-6">Welcome to The Lab</h1>
           <p className="text-xl text-ink/80 leading-relaxed mb-10">
-            We don't want you to trust our AI blindly. True media literacy means validating information for yourself. Welcome to The Lab: your training ground to dismantle deception!
+            We don&apos;t want you to trust our AI blindly. True media literacy means validating information for yourself. Welcome to The Lab: your training ground to dismantle deception!
           </p>
           <button
             onClick={() => setHasStarted(true)}

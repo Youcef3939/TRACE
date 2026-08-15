@@ -33,7 +33,7 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
           <div className="flex flex-col gap-4 border-b border-ink/10 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8 bg-white">
             <div>
               <span className="font-mono text-xs uppercase tracking-widest text-ink/40">
-                // TARGET_CLAIM_ID: 982A-F3
+                {"// TARGET_CLAIM_ID: 982A-F3"}
               </span>
               <p className="mt-2 text-xl font-semibold text-ink sm:text-2xl">
                 &ldquo;Drinking coffee cures stage 4 cancer within weeks.&rdquo;
@@ -74,14 +74,14 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
                   <div className="rounded-xl border border-ink/10 bg-cream/50 p-5">
                     <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-ink/50">Viral Social Post</span>
                     <p className="text-sm italic text-ink/80">
-                      "A new breakthrough! Big Pharma is hiding this, but drinking 3 cups of coffee daily actually cures stage 4 cancer within weeks! ☕🧬"
+                      &ldquo;A new breakthrough! Big Pharma is hiding this, but drinking 3 cups of coffee daily actually cures stage 4 cancer within weeks! ☕🧬&rdquo;
                     </p>
                   </div>
                   <div className="rounded-xl border border-ink/10 bg-cream/50 p-5 flex flex-col justify-between">
                     <div>
                       <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-teal">Primary Source (Study)</span>
                       <p className="text-sm text-ink/80 leading-relaxed">
-                        "While coffee consumption shows potential antioxidant benefits, <span className="bg-coral/20 text-ink font-semibold px-1 rounded">there is no clinical evidence that it acts as a cure or viable treatment for any stage of cancer.</span> Patients should not replace prescribed treatments."
+                        &ldquo;While coffee consumption shows potential antioxidant benefits, <span className="bg-coral/20 text-ink font-semibold px-1 rounded">there is no clinical evidence that it acts as a cure or viable treatment for any stage of cancer.</span> Patients should not replace prescribed treatments.&rdquo;
                       </p>
                     </div>
                     <a 
@@ -104,7 +104,7 @@ export default function InAction({ showCta = false }: { showCta?: boolean }) {
                   <h3 className="text-lg font-semibold text-ink">Explainable Assessment</h3>
                 </div>
                 <p className="text-sm leading-relaxed text-ink/70 max-w-2xl">
-                  Major health authorities explicitly list this claim as a documented myth. The viral post relies on absolute language ("cures cancer") and artificial urgency ("Big Pharma is hiding this") without providing a verifiable source.
+                  Major health authorities explicitly list this claim as a documented myth. The viral post relies on absolute language (&ldquo;cures cancer&rdquo;) and artificial urgency (&ldquo;Big Pharma is hiding this&rdquo;) without providing a verifiable source.
                 </p>
               </div>
 

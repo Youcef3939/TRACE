@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, MessageSquare, Hash, Globe } from "lucide-react";
+import { MessageSquare, Hash, Globe } from "lucide-react";
 import type { LabClaim } from "@/lib/lab/claims";
 
 export default function ClaimCard({ claim }: { claim: LabClaim }) {
@@ -18,7 +18,7 @@ export default function ClaimCard({ claim }: { claim: LabClaim }) {
         </div>
       </div>
       <p className="text-lg text-ink/90 leading-relaxed italic border-l-4 border-coral/30 pl-4 py-1">
-        "{claim.content}"
+        &ldquo;{claim.content}&rdquo;
       </p>
     </div>
   );
